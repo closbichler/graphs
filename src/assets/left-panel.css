@@ -1,0 +1,14 @@
+.left-panel {
+    left: 0;
+    height: 80vh;
+    top: 10vh;
+}
+
+#adj-matrix {
+    width: calc(100% - 1em);
+    height: 10rem;
+    resize: none;
+    white-space: pre;
+    padding: 0.5em !;
+    line-height: 1.2em;
+}
