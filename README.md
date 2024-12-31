@@ -5,4 +5,9 @@ Web-App for creating and analyzing graphs
 `npm run dev`
 
 ## Todo
-- https://www.untitledui.com/free-icons
+- Redesign frontend (https://www.untitledui.com/free-icons)
+- Implement zoom
+- Implement shortcuts for editing nodes
+- Fix pathfinding weight issue
+- Better reposition function
+- Provide funny example graphs

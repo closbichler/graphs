@@ -1,5 +1,5 @@
 <template>
-    <div class='panel right-panel'>
+    <div class='panel panel-right'> 
         <details>
             <summary role='button'>Find path</summary>
             <div class='function-input'>
@@ -24,10 +24,10 @@
 
 
 <script setup>
-import '../assets/right-panel.css'
+import '../assets/styles/panelright.css'
 
 import { ref, watch } from 'vue'
-import { findPath } from './functions/pathfinder'
+import { findPath } from '../utils/pathfinder'
 
 const graph = defineModel({ required: true })
 const emit = defineEmits(['update:modelValue'])

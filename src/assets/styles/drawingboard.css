@@ -1,0 +1,35 @@
+.auto-position {
+    display: none;
+}
+
+#drawing-board {
+    position: fixed;
+    display: block;
+}
+
+#drawing-board-context-menu {
+    position: absolute;
+    z-index: 100;
+    top: 50px;
+    left: 50px;
+    list-style: none;
+    padding: 3px;
+    background: red;
+    user-select: none;
+    cursor: pointer;
+    display: none;
+}
+
+#drawing-board-context-menu li {
+    list-style: none;
+}
+
+.zoom-group input {
+    display: none;
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 1;
+    width: 2em;
+    height: 1em;
+}

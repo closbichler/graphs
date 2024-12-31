@@ -1,5 +1,5 @@
 <template>
-    <div class='panel left-panel grid'>
+    <div class='panel panel-left grid'>
         <div calss='adj-matrix-div'>
             <span>Adjacency Matrix</span>
             <textarea id='adj-matrix' aria-describedby='adj-matrix-helper' @input='onChange()'
@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import '../assets/left-panel.css'
+import '../assets/styles/panelleft.css'
 
 import { ref, watch } from 'vue'
 

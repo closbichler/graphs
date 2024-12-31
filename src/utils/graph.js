@@ -43,6 +43,7 @@ class Graph {
     }
 
     offset = new Vector();
+    zoomFactor = 1;
 
     constructor(adjMatrix) {
         this.getNodesFromAdjMatrix(adjMatrix);

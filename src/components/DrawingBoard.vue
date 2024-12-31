@@ -1,12 +1,11 @@
 <template>
-  <div class="canvas-controls">
+  <div class="toolbar">
     <div class="select-mode">
       <fieldset>
         <label htmlFor="input-mode-1">
           <input type="radio" id="input-mode-1" value="select" name="input-mode" v-model="inputMode"
             @change="changeMode">
-          <!-- <span :style="{ backgroundImage:'url(' + require('~@/assets/icons/pointer.svg') + ')' }"></span> -->
-          <span style="background-image:url('~@/assets/icons/pointer.svg')"></span>
+          <span></span>
         </label>
 
         <label htmlFor="input-mode-2">
@@ -31,37 +30,46 @@
     </div>
 
     <div>
-      <input type="text" v-model="textInput" :placeholder="textInputPlaceholder" 
-        :disabled="textInputPlaceholder==''" @input="changeGraphValue">
+      <input type="text" v-model="textInput" :placeholder="textInputPlaceholder" :disabled="textInputPlaceholder == ''"
+        @input="changeGraphValue">
     </div>
 
     <span>{{ debugInfo }}</span>
+
+    <div class="toolbar-right">
+      <input type="button" value="x" @click="hideRightPanel">
+    </div>
   </div>
 
   <div class="drawing-board">
-    <canvas id="drawing-board" ref="canvas" @contextmenu.prevent.stop="onContextMenu"
-      @mousemove="onMouseDown" @click="onMouseClick">
+    <canvas id="drawing-board" ref="canvas" @contextmenu.prevent.stop="onContextMenu" @mousemove="onMouseDown"
+      @click="onMouseClick">
       Your browser does not support the canvas element.
     </canvas>
     <ul id="drawing-board-context-menu">
       <li>Edit</li>
       <li>Remove</li>
     </ul>
+    <div class="zoom-group">
+      <input type="button" value="+" @onclick="zoomIn()">
+      <input type="button" value="-" @onclick="zoomOut()">
+    </div>
   </div>
 </template>
 
 <script setup>
-import '../assets/drawingboard.css'
+import '../assets/styles/toolbar.css'
+import '../assets/styles/drawingboard.css'
 
 import { ref, watch, onMounted } from 'vue';
-import { drawGraph } from './draw.js';
-import { Interaction } from './interaction.js';
+import { drawGraph } from '../utils/draw.js';
+import { Interaction } from '../utils/interaction.js';
 
 const graph = defineModel({ required: true })
 const canvas = ref();
 const debugInfo = ref();
 var textInput = "";
-var textInputPlaceholder = undefined;
+var textInputPlaceholder = "";
 const emit = defineEmits(['update:modelValue'])
 
 const interaction = new Interaction(graph.value);
@@ -84,10 +92,10 @@ window.addEventListener('resize', resizeCanvas, false);
 function resizeCanvas() {
   if (canvas.value !== null) {
     canvas.value.width = window.innerWidth;
-    canvas.value.height = window.innerHeight * 0.9;
+    canvas.value.height = window.innerHeight
     debugInfo.value = "resize canvas";
     drawCanvas();
-  } 
+  }
 }
 
 function drawCanvas() {
@@ -105,7 +113,7 @@ function onMouseClick(event) {
     textInputPlaceholder = "node name";
   } else if (interaction.state.selectedEdge !== undefined) {
     textInput = graph.value.nodes[interaction.state.selectedEdge.from]
-                .edgesTo[interaction.state.selectedEdge.to].weight;
+      .edgesTo[interaction.state.selectedEdge.to].weight;
     textInputPlaceholder = "edge weight";
   } else {
     textInput = "";
@@ -117,7 +125,7 @@ function onMouseDown(event) {
   if (interaction.onCanvasDrag(event))
     drawCanvas();
   debugInfo.value = interaction.debugInfo ? interaction.debugInfo : debugInfo.value;
-} 
+}
 
 function onContextMenu(event) {
   if (interaction.onContextMenu(event))
@@ -147,6 +155,28 @@ function deselectAll() {
   debugInfo.value = "deselected and dehighlighted";
 }
 
+function zoomIn() {
+  if (graph.value.zoomFactor < 2)
+    graph.value.zoomFactor += 1.2;
+  else
+    graph.value.zoomFactor += 1.6;
+}
+
+function zoomOut() {
+  if (graph.value.zoomFactor < 2)
+    graph.value.zoomFactor -= 1.2;
+  else
+    graph.value.zoomFactor -= 1.6;
+}
+
+function hideRightPanel() {
+  let panel = document.getElementsByClassName("panel-right")[0];
+  if (panel.classList.contains("collapsed"))
+    panel.classList.remove("collapsed");
+  else
+    panel.classList.add("collapsed");
+}
+
 function changeGraphValue() {
   if (interaction.state.selectedNode !== undefined) {
     graph.value.nodes[interaction.state.selectedNode].name = textInput;
@@ -155,7 +185,7 @@ function changeGraphValue() {
     let newWeight = Number(textInput);
     if (!isNaN(newWeight)) {
       graph.value.nodes[interaction.state.selectedEdge.from]
-                  .edgesTo[interaction.state.selectedEdge.to].weight = Number(textInput);
+        .edgesTo[interaction.state.selectedEdge.to].weight = Number(textInput);
       debugInfo.value = "changed edge weight";
     }
   }

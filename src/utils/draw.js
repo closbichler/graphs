@@ -96,6 +96,7 @@ function drawGraph(canvas, graph) {
     drawGrid(canvas, ctx);
 
     ctx.translate(graph.offset.x, graph.offset.y);
+    ctx.scale(graph.zoomFactor, graph.zoomFactor);
 
     for (let node of graph.nodes) {
         
