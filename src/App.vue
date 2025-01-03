@@ -1,19 +1,13 @@
 <script setup>
 import { ref } from 'vue';
-import { Graph } from './utils/graph'
+import { Graph, SAMPLE_GRAPHS } from './utils/graph'
 
 import DrawingBoard from './components/DrawingBoard.vue'
 import LeftPanel from './components/PanelLeft.vue'
 import RightPanel from './components/PanelRight.vue'
 
-const defaultAdjMatrix = 
-  [[0,1,0,0,0],
-   [0,0,0,1,0],
-   [0,0,0,0,0],
-   [0,0,0,0,1],
-   [0,0,0,0,0]];
-
-const graph = ref(new Graph(defaultAdjMatrix));
+const graph = ref(new Graph([]))
+graph.value.applySampleGraph(0)
 </script>
 
 <template>

@@ -8,22 +8,24 @@
 
             <div>
                 <div>
-                    <input type='checkbox' id='check-directed' v-model='options.directed' v-on:change='toggleCheckbox'>
+                    <input type='checkbox' id='check-directed' v-model='options.directed'
+                        v-on:change='toggleCheckboxes'>
                     <label for='check-directed'>directed</label>
                 </div>
 
                 <div>
-                    <input type='checkbox' id='check-weighted' v-model='options.weighted' v-on:change='toggleCheckbox'>
+                    <input type='checkbox' id='check-weighted' v-model='options.weighted'
+                        v-on:change='toggleCheckboxes'>
                     <label for='check-weighted'>weighted</label>
                 </div>
 
-                <div>
-                    <input type='checkbox' id='check-loops' v-model='options.loops' v-on:change='toggleCheckbox'>
+                <div style="display:none">
+                    <input type='checkbox' id='check-loops' v-model='options.loops' v-on:change='toggleCheckboxes'>
                     <label for='check-loops'>loops allowed</label>
                 </div>
 
-                <div>
-                    <input type='checkbox' id='check-simple' v-model='options.simple' v-on:change='toggleCheckbox'>
+                <div style="display:none">
+                    <input type='checkbox' id='check-simple' v-model='options.simple' v-on:change='toggleCheckboxes'>
                     <label for='check-simple'>simple graph</label>
                 </div>
             </div>
@@ -43,13 +45,14 @@ const adjMatrixInput = ref(adjMatrixToInput())
 
 const options = {
     directed: graph.value.properties.directed,
+    weighted: graph.value.properties.weighted,
     simple: graph.value.properties.simple,
     loops: graph.value.properties.loops,
-    weighted: graph.value.properties.weighted
 }
 
 watch(graph, () => {
     adjMatrixInput.value = adjMatrixToInput()
+    updateCheckboxes()
 }, { deep: true })
 
 function adjMatrixToInput() {
@@ -118,12 +121,19 @@ function onChange() {
     }
 }
 
-function toggleCheckbox() {
+function toggleCheckboxes() {
     graph.value.properties.directed = options.directed
     graph.value.properties.loops = options.loops
     graph.value.properties.weighted = options.weighted
     graph.value.properties.simple = options.simple
     emit('update:modelValue', graph)
     onChange()
+}
+
+function updateCheckboxes() {
+    options.directed = graph.value.properties.directed
+    options.loops = graph.value.properties.loops
+    options.weighted = graph.value.properties.weighted
+    options.simple = graph.value.properties.simple
 }
 </script>

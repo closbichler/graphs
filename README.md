@@ -5,9 +5,13 @@ Web-App for creating and analyzing graphs
 `npm run dev`
 
 ## Todo
-- Redesign frontend (https://www.untitledui.com/free-icons)
+- Frontend: https://www.untitledui.com/free-icons
+- Fix long edge select issue
+- Don't allow to enter ¬1 value for undirected graphs
+- Disable text field when deselecting
 - Implement zoom
 - Implement shortcuts for editing nodes
+- Implement remove nodes/edges
 - Fix pathfinding weight issue
-- Better reposition function
-- Provide funny example graphs
+- Pathfinding with node names
+- Implement context menu??

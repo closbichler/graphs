@@ -31,32 +31,32 @@ class Interaction {
     }
 
     #edgeClicked(x, y) {
-        for (let ni=0; ni<this.graph.nodes.length; ni++) {
-            let node = this.graph.nodes[ni];
+        let bestEdge = undefined
+        let bestDistance = 10000
 
-            for (let ei=0; ei<node.edgesTo.length; ei++) {
-                let edge = node.edgesTo[ei];
+        for (let from=0; from<this.graph.nodes.length; from++) {
+            let nodeFrom = this.graph.nodes[from];
 
-                if (edge === undefined)
+            for (let to=0; to<nodeFrom.edgesTo.length; to++) {
+                if (nodeFrom.edgesTo[to] === undefined)
                     continue;
-
-                let x1 = node.pos.x, y1 = node.pos.y,
-                    x2 = this.graph.nodes[ei].pos.x, y2 = this.graph.nodes[ei].pos.y;
                 
-                let h1 = (y2-y1)*x - (x2-x1)*y +x2*y1 - y2*x1;
-                let num = Math.abs(h1);
-                let h2 = Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2);
-                let denom = Math.sqrt(h2);
-                let d = num / denom;
+                let nodeTo = this.graph.nodes[to]
+                let mousePos = new Vector(x, y).sub(nodeFrom.edgesTo[to].offset)
+                let a = Vector.getDistanceVector(nodeFrom.pos, nodeTo.pos).getLength()
+                let b = Vector.getDistanceVector(nodeFrom.pos, mousePos).getLength()
+                let c = Vector.getDistanceVector(nodeTo.pos, mousePos).getLength()
+                let s = (a + b + c) / 2
+                let h = 2/a * Math.sqrt(s*(s-a)*(s-b)*(s-c))
 
-                if (d < 10) {
-                    let edge = { from: ni, to: ei };
-                    return edge;
+                if (bestEdge === undefined && h < 10 || bestEdge !== undefined && h < bestDistance) {
+                    bestEdge = { from: from, to: to };
+                    bestDistance = h
                 }
             }
         }
 
-        return undefined;
+        return bestEdge;
     }
 
     #selectNode(node) {
@@ -107,18 +107,9 @@ class Interaction {
                 this.debugInfo = "ERR: multigraph not implemented"
                 this.deselectNode();
             } else {
-                let newEdge = new Edge(1);
-                this.graph.nodes[this.state.selectedNode].edgesTo[node] = newEdge;
-
-                if (!this.graph.properties.directed) {
-                    newEdge.directed = false;
-                    if (this.graph.nodes[node].edgesFrom[this.state.selectedNode] == undefined) {
-                        this.graph.nodes[node].edgesFrom[this.state.selectedNode] = newEdge;
-                    }
-                }
-
-                this.debugInfo = "edge (" + this.state.selectedNode + "," + node + ") created";
-                this.deselectNode();
+                this.graph.insertEdge(this.state.selectedNode, node, 1)
+                this.debugInfo = "edge (" + this.state.selectedNode + "," + node + ") created"
+                this.deselectNode()
             }            
         }
     }
@@ -197,6 +188,7 @@ class Interaction {
                 this.graph.nodes[this.state.draggingNode].pos.y = y;
                 this.debugInfo = "drag " + this.state.draggingNode;
                 this.state.dragging = true;
+                this.graph.calculateEdgeOffset()
                 return true;
             }
 
@@ -227,7 +219,7 @@ class Interaction {
         let node = this.#nodeClicked(x, y);
         let edge = this.#edgeClicked(x, y);
 
-        
+        // TODO
     }
 }
 

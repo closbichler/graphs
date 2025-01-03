@@ -1,22 +1,37 @@
 <template>
-    <div class='panel panel-right'> 
+    <div class='panel panel-right'>
+        <details>
+            <summary role='button'>Example Graphs</summary>
+            <div class='example-graphs'>
+                <div class='grid'>
+                    <input type='button' value='1' @click='sampleGraph(1)'>
+                    <input type='button' value='2' @click='sampleGraph(2)'>
+                </div>
+                <div class='grid'>
+                    <input type='button' value='3' @click='sampleGraph(3)'>
+                </div>
+            </div>
+        </details>
         <details>
             <summary role='button'>Find path</summary>
             <div class='function-input'>
                 <div class='grid'>
                     <div>
-                        <label>from</label>
-                        <input type='text' placeholder='node' id='in1'>
+                        <label></label>
+                        <input type='text' placeholder='origin node' id='in1'>
                     </div>
 
                     <div>
-                        <label>to</label>
-                        <input type='text' placeholder='node' id='in2'>
+                        <label></label>
+                        <input type='text' placeholder='destination node' id='in2'>
                     </div>
                 </div>
-
-                <input type='submit' value='calculate' @click='funcFindPath'>
-                <span id='result'>{{ path }}</span>
+                <div class='grid'>
+                    <input type='submit' value='calculate' @click='funcFindPath'>
+                </div>
+                <div class='grid'>
+                    <span id='result'>{{ path }}</span>
+                </div>
             </div>
         </details>
     </div>
@@ -26,12 +41,16 @@
 <script setup>
 import '../assets/styles/panelright.css'
 
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { findPath } from '../utils/pathfinder'
 
 const graph = defineModel({ required: true })
 const emit = defineEmits(['update:modelValue'])
 const path = ref();
+
+function sampleGraph(sampleNo) {
+    graph.value.applySampleGraph(sampleNo)
+}
 
 function funcFindPath() {
     graph.value.dehighlightNodes()
@@ -43,7 +62,7 @@ function funcFindPath() {
     if (!(n1 < graph.value.nodes.length && n2 < graph.value.nodes.length)) {
         path.value = "wrong input";
         return;
-    }   
+    }
 
     let result = findPath(graph.value, n1, n2)
 
@@ -53,8 +72,8 @@ function funcFindPath() {
     }
 
     graph.value.highlightNodes(result.visitedNodes)
-    for (let i=0; i<result.visitedNodes.length-1; i++) {
-        graph.value.highlightEdges([[result.visitedNodes[i], result.visitedNodes[i+1]]])
+    for (let i = 0; i < result.visitedNodes.length - 1; i++) {
+        graph.value.highlightEdges([[result.visitedNodes[i], result.visitedNodes[i + 1]]])
     }
 
     emit('update:modelValue', graph)

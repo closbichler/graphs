@@ -1,8 +1,13 @@
+:root {
+    --toolbar-height: 2rem;
+    --button-height: 1.6rem;
+}
+
 .toolbar {
     position: absolute;
     display: flex;
     align-items: center;
-    height: 2rem;
+    height: var(--toolbar-height);
     width: 100%;
     z-index: 100;
     background-color: var(--pico-background-color);
@@ -18,8 +23,8 @@
 }
 
 .toolbar button, .toolbar input {
-    height: 1.5em;
-    font-size: 1em;
+    height: var(--button-height);
+    font-size: 0.8em;
     margin: 0;
     padding: 0 0.2em 0 0.2em;
 }
@@ -47,8 +52,8 @@
     background-color: var(--pico-primary-background);
     border: 4px solid var(--pico-primary-background);
     border-radius: var(--pico-border-radius);
-    width: 1.8em;
-    height: 1.8em;
+    width: var(--button-height);
+    height: var(--button-height);
     display: inline-block;
     vertical-align: top;
     background-repeat: no-repeat;
@@ -78,4 +83,40 @@
 .select-mode label[for="input-mode-3"] span:before,
 .select-mode label[for="input-mode-3"] span:after {
     background-image: url('/src/assets/icons/arrow-up-right.svg');
+}
+
+#close-sidepanel {
+    display: inline-block;
+    cursor: pointer;
+    margin: 0;
+}
+#close-sidepanel input {
+    display: none;
+}
+#close-sidepanel span {
+    position: relative;
+    line-height: 22px;
+}
+#close-sidepanel span:before,
+#close-sidepanel span:after {
+    content: '';
+    background-color: var(--pico-primary-background);
+    border: 4px solid var(--pico-primary-background);
+    border-radius: var(--pico-border-radius);
+    background-image: url('/src/assets/icons/flex-align-left.svg');
+    width: var(--button-height);
+    height: var(--button-height);
+    display: inline-block;
+    vertical-align: top;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+#close-sidepanel span:after {
+    background-color: var(--pico-primary-hover-background);
+    border: 4px solid var(--pico-primary-hover-background);
+    position: absolute;
+    top: -4px;
+    left: 0px;
+    transition: 300ms;
+    opacity: 0;
 }

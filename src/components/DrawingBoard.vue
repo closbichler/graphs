@@ -23,7 +23,7 @@
     </div>
 
     <div>
-      <button @click="resetGraph" type="reset">Reposition</button>
+      <button @click="repositionGraph" type="reset">Reposition</button>
     </div>
     <div>
       <button @click="deselectAll" type="reset">Deselect</button>
@@ -37,7 +37,10 @@
     <span>{{ debugInfo }}</span>
 
     <div class="toolbar-right">
-      <input type="button" value="x" @click="hideRightPanel">
+      <label htmlFor="close-sidepanel-button" id="close-sidepanel">
+        <input type="button" id="close-sidepanel-button" @click="hideRightPanel">
+        <span></span>
+      </label>
     </div>
   </div>
 
@@ -77,8 +80,8 @@ var toggleAutoPosition = false;
 var inputMode = "select";
 
 watch(graph, () => {
-  if (toggleAutoPosition)
-    graph.value.reposition();
+  // if (toggleAutoPosition)
+  //   graph.value.reposition();
 
   drawCanvas();
 }, { deep: true })
@@ -140,10 +143,10 @@ function changeMode() {
   debugInfo.value = "changed input mode to " + inputMode;
 }
 
-function resetGraph() {
+function repositionGraph() {
   graph.value.reposition();
   drawCanvas();
-  debugInfo.value = "reset graph";
+  debugInfo.value = "reposition graph";
 }
 
 function deselectAll() {

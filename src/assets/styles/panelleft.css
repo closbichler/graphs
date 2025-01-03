@@ -1,7 +1,12 @@
 .panel-left {
-    left: 0;
+    position: fixed;
     height: 100%;
-    top: 2rem;
+    width: 15em;
+    left: 0;
+    top: var(--toolbar-height);
+    background-color: var(--pico-modal-overlay-background-color);
+    font-size: 0.8rem;
+    padding: 0.5em;
 }
 
 #adj-matrix {
