@@ -6,6 +6,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: "/graphs/",
   plugins: [
     vue(),
     vueJsx(),
@@ -15,5 +16,4 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  publicPath: "/graphs/", //process.env.NODE_ENV === "production" ? "/graphs/" : "/",
 })
