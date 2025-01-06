@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { Graph, SAMPLE_GRAPHS } from './utils/graph'
+import { Graph } from './utils/graph'
 
 import DrawingBoard from './components/DrawingBoard.vue'
 import LeftPanel from './components/PanelLeft.vue'

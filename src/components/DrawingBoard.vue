@@ -61,135 +61,135 @@
 </template>
 
 <script setup>
-import '../assets/styles/toolbar.css'
-import '../assets/styles/drawingboard.css'
+import '@/assets/styles/toolbar.css'
+import '@/assets/styles/drawingboard.css'
 
-import { ref, watch, onMounted } from 'vue';
-import { drawGraph } from '../utils/draw.js';
-import { Interaction } from '../utils/interaction.js';
+import { ref, watch, onMounted } from 'vue'
+import { drawGraph } from '@/utils/draw.js'
+import { Interaction } from '@/utils/interaction.js'
 
 const graph = defineModel({ required: true })
-const canvas = ref();
-const debugInfo = ref();
-var textInput = "";
-var textInputPlaceholder = "";
-const emit = defineEmits(['update:modelValue'])
+const canvas = ref()
+const debugInfo = ref()
 
-const interaction = new Interaction(graph.value);
-var toggleAutoPosition = false;
-var inputMode = "select";
+const interaction = new Interaction(graph.value)
+var inputMode = "select"
+var textInput = ""
+var textInputPlaceholder = ""
+
+window.addEventListener('resize', resizeCanvas, false)
 
 watch(graph, () => {
-  // if (toggleAutoPosition)
-  //   graph.value.reposition();
-
-  drawCanvas();
+  drawCanvas()
 }, { deep: true })
 
 onMounted(() => {
-  resizeCanvas();
+  resizeCanvas()
 })
 
-window.addEventListener('resize', resizeCanvas, false);
-
 function resizeCanvas() {
-  if (canvas.value !== null) {
-    canvas.value.width = window.innerWidth;
+  if (canvas.value !== undefined) {
+    canvas.value.width = window.innerWidth
     canvas.value.height = window.innerHeight
-    debugInfo.value = "resize canvas";
-    drawCanvas();
+    debugInfo.value = "resize canvas"
+    drawCanvas()
   }
 }
 
 function drawCanvas() {
-  drawGraph(canvas.value, graph.value);
+  drawGraph(canvas.value, graph.value)
 }
 
 function onMouseClick(event) {
-  interaction.onCanvasClick(event);
-  emit('update:modelValue', graph);
-  drawCanvas();
-  debugInfo.value = interaction.debugInfo ? interaction.debugInfo : debugInfo.value;
+  if (!interaction.onCanvasClick(event))
+    return
+
+  drawCanvas()
+  debugInfo.value = interaction.debugInfo ? interaction.debugInfo : debugInfo.value
 
   if (interaction.state.selectedNode !== undefined) {
-    textInput = graph.value.nodes[interaction.state.selectedNode].name;
-    textInputPlaceholder = "node name";
+    textInput = graph.value.nodes[interaction.state.selectedNode].name
+    textInputPlaceholder = "node name"
   } else if (interaction.state.selectedEdge !== undefined) {
     textInput = graph.value.nodes[interaction.state.selectedEdge.from]
-      .edgesTo[interaction.state.selectedEdge.to].weight;
-    textInputPlaceholder = "edge weight";
+      .edgesTo[interaction.state.selectedEdge.to].weight
+    textInputPlaceholder = "edge weight"
   } else {
-    textInput = "";
-    textInputPlaceholder = undefined;
+    textInput = ""
+    textInputPlaceholder = undefined
   }
 }
 
 function onMouseDown(event) {
-  if (interaction.onCanvasDrag(event))
-    drawCanvas();
-  debugInfo.value = interaction.debugInfo ? interaction.debugInfo : debugInfo.value;
+  if (!interaction.onCanvasDrag(event))
+    return
+
+  drawCanvas()
+  debugInfo.value = interaction.debugInfo
 }
 
 function onContextMenu(event) {
-  if (interaction.onContextMenu(event))
-    drawCanvas();
-  debugInfo.value = interaction.debugInfo;
+  if (!interaction.onContextMenu(event))
+    return
+
+  drawCanvas()
+  debugInfo.value = interaction.debugInfo
 }
 
 function changeMode() {
-  interaction.state.mode = inputMode;
-  interaction.deselectNode();
-  drawCanvas();
-  debugInfo.value = "changed input mode to " + inputMode;
+  interaction.state.mode = inputMode
+  interaction.deselectNode()
+  drawCanvas()
+  debugInfo.value = "changed input mode to " + inputMode
 }
 
 function repositionGraph() {
-  graph.value.reposition();
-  drawCanvas();
-  debugInfo.value = "reposition graph";
+  graph.value.reposition()
+  drawCanvas()
+  debugInfo.value = "reposition graph"
 }
 
 function deselectAll() {
-  graph.value.dehighlightNodes();
-  graph.value.dehighlightEdges();
-  interaction.deselectNode();
-  interaction.deselectEdge();
-  drawCanvas();
-  debugInfo.value = "deselected and dehighlighted";
+  graph.value.dehighlightNodes()
+  graph.value.dehighlightEdges()
+  interaction.deselectNode()
+  interaction.deselectEdge()
+  drawCanvas()
+  debugInfo.value = "deselected and dehighlighted"
 }
 
 function zoomIn() {
   if (graph.value.zoomFactor < 2)
-    graph.value.zoomFactor += 1.2;
+    graph.value.zoomFactor += 1.2
   else
-    graph.value.zoomFactor += 1.6;
+    graph.value.zoomFactor += 1.6
 }
 
 function zoomOut() {
   if (graph.value.zoomFactor < 2)
-    graph.value.zoomFactor -= 1.2;
+    graph.value.zoomFactor -= 1.2
   else
-    graph.value.zoomFactor -= 1.6;
+    graph.value.zoomFactor -= 1.6
 }
 
 function hideRightPanel() {
-  let panel = document.getElementsByClassName("panel-right")[0];
+  let panel = document.getElementsByClassName("panel-right")[0]
   if (panel.classList.contains("collapsed"))
-    panel.classList.remove("collapsed");
+    panel.classList.remove("collapsed")
   else
-    panel.classList.add("collapsed");
+    panel.classList.add("collapsed")
 }
 
 function changeGraphValue() {
   if (interaction.state.selectedNode !== undefined) {
-    graph.value.nodes[interaction.state.selectedNode].name = textInput;
-    textInputPlaceholder = "changed node name";
+    graph.value.nodes[interaction.state.selectedNode].name = textInput
+    textInputPlaceholder = "changed node name"
   } else if (interaction.state.selectedEdge !== undefined) {
-    let newWeight = Number(textInput);
+    let newWeight = Number(textInput)
     if (!isNaN(newWeight)) {
       graph.value.nodes[interaction.state.selectedEdge.from]
-        .edgesTo[interaction.state.selectedEdge.to].weight = Number(textInput);
-      debugInfo.value = "changed edge weight";
+        .edgesTo[interaction.state.selectedEdge.to].weight = Number(textInput)
+      debugInfo.value = "changed edge weight"
     }
   }
 }
