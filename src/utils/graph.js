@@ -7,7 +7,6 @@ class Node {
     name = ""
     pos = new Vector(0, 0)
     edgesTo = []
-    edgesFrom = []
 
     style = {
         selected: false,
@@ -23,7 +22,6 @@ class Node {
         let clone = new Node(this.name)
         clone.pos = this.pos.clone()
         clone.edgesTo = structuredClone(this.edgesTo)
-        clone.edgesFrom = structuredClone(this.edgesFrom)
         clone.style = structuredClone(this.style)
         return clone
     }
@@ -94,17 +92,14 @@ class Graph {
         for (let i = 0; i < this.nodes.length; i++) {
             this.nodes[i].edgesTo[id] = undefined
             newNode.edgesTo[i] = undefined
-            newNode.edgesFrom[i] = undefined
         }
     }
 
     insertEdge(nodeFrom, nodeTo, weight) {
         let edge = new Edge(weight);
         this.nodes[nodeFrom].edgesTo[nodeTo] = edge;
-        this.nodes[nodeTo].edgesFrom[nodeFrom] = edge;
         
         if (!this.properties.directed) {
-            this.nodes[nodeFrom].edgesFrom[nodeTo] = edge;
             this.nodes[nodeTo].edgesTo[nodeFrom] = edge;
         }
         
@@ -129,14 +124,6 @@ class Graph {
                 if (adjMatrix[index][i] != 0)
                     edgeTo = this.properties.weighted ? new Edge(adjMatrix[index][i]) : new Edge(1);
                 node.edgesTo.push(edgeTo);
-            }
-
-            node.edgesFrom = [];
-            for (let i = 0; i < nNodes; i++) {
-                let edgeFrom = undefined;
-                if (adjMatrix[i][index] != 0)
-                    edgeFrom = this.nodes[i].edgesTo[index];
-                node.edgesFrom.push(edgeFrom);
             }
         })
 

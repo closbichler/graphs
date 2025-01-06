@@ -1,5 +1,5 @@
 function findPath(graph, originNode, destNode) {
-    console.log(graph.nodes[0].edgesFrom)
+    return undefined
 
     let visited = [graph.nodes];
     for (let i=0; i<graph.nodes.length; i++) {
@@ -26,7 +26,6 @@ function getCostOfNeighbors(graph, visited, currentNode, currentCost, currentPat
 
     for (let i=0; i<graph.nodes.length; i++) {
         let edge = graph.nodes[currentNode].edgesTo[i];
-        let edgeFrom = graph.nodes[i].edgesFrom[currentNode];
 
         //console.log(edgeFrom)
         
