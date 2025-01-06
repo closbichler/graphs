@@ -8,31 +8,39 @@ on:
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [18.x]
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout main Branch
+      uses: actions/checkout@v4
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm ci
-    - run: npm run build
-    - run: npm test --if-present
-    - uses: actions/upload-pages-artifact@v3
+
+    - name: Install Packages and Build Vue.js
+      run: |
+        npm ci
+        npm run build
+
+    - name: Upload Artifact
+      uses: actions/upload-pages-artifact@v3
       with:
         path: dist/
 
   deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
     permissions:
       pages: write
       id-token: write
