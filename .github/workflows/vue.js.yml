@@ -22,7 +22,7 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npm run build
-    - run: npm test
+    - run: npm test --if-present
     - uses: actions/upload-pages-artifact@v3
       with:
         path: dist/
