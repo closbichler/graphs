@@ -17,7 +17,6 @@ Run local webserver on 127.0.0.1:8000
 The repo is automatically deployed to github pages via Github Actions on commits to the main branch. It is accessible on https://closbichler.github.io/graphs/
 
 ## Todo
-- Reimplement pathfinding (with node names)
 - Fix long edge select issue
 - Don't allow to enter ¬1 value for undirected graphs
 - Disable text field when deselecting

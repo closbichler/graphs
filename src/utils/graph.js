@@ -144,6 +144,14 @@ class Graph {
     return matrix;
   }
 
+  getNodeIndexByName(nodeName) {
+    for (let n=0; n<this.nodes.length; n++) {
+      if (this.nodes[n].name === nodeName)
+        return n
+    }
+    return undefined
+  }
+
   calculateEdgeOffset() {
     for (let n = 0; n < this.nodes.length; n++) {
       for (let e = n + 1; e < this.nodes.length; e++) {

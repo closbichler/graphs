@@ -30,7 +30,7 @@
     </div>
 
     <div>
-      <input type="text" v-model="textInput" :placeholder="textInputPlaceholder" :disabled="textInputPlaceholder == ''"
+      <input type="text" v-model="textInput" :placeholder="textInputPlaceholder" :disabled="textInputPlaceholder === ''"
         @input="changeGraphValue">
     </div>
 
@@ -73,9 +73,9 @@ const canvas = ref()
 const debugInfo = ref()
 
 const interaction = new Interaction(graph.value)
-var inputMode = "select"
-var textInput = ""
-var textInputPlaceholder = ""
+var inputMode = 'select'
+var textInput = ''
+var textInputPlaceholder = ''
 
 window.addEventListener('resize', resizeCanvas, false)
 
@@ -101,23 +101,22 @@ function drawCanvas() {
 }
 
 function onMouseClick(event) {
-  if (!interaction.onCanvasClick(event))
-    return
+  interaction.onCanvasClick(event)
+
+  console.log(interaction.state.selectedNode + ' ' + interaction.state.selectedEdge)
+
+  if (interaction.state.selectedNode !== undefined) {
+    enableInputText(graph.value.nodes[interaction.state.selectedNode].name, 'node name')
+  } else if (interaction.state.selectedEdge !== undefined) {
+    let edgeWeight = graph.value.nodes[interaction.state.selectedEdge.from]
+      .edgesTo[interaction.state.selectedEdge.to].weight
+    enableInputText(edgeWeight, 'edge weight')
+  } else {
+    disableInputText()
+  }
 
   drawCanvas()
   debugInfo.value = interaction.debugInfo ? interaction.debugInfo : debugInfo.value
-
-  if (interaction.state.selectedNode !== undefined) {
-    textInput = graph.value.nodes[interaction.state.selectedNode].name
-    textInputPlaceholder = "node name"
-  } else if (interaction.state.selectedEdge !== undefined) {
-    textInput = graph.value.nodes[interaction.state.selectedEdge.from]
-      .edgesTo[interaction.state.selectedEdge.to].weight
-    textInputPlaceholder = "edge weight"
-  } else {
-    textInput = ""
-    textInputPlaceholder = undefined
-  }
 }
 
 function onMouseDown(event) {
@@ -134,6 +133,16 @@ function onContextMenu(event) {
 
   drawCanvas()
   debugInfo.value = interaction.debugInfo
+}
+
+function enableInputText(text, placeholder) {
+  textInputPlaceholder = placeholder
+  textInput = text
+}
+
+function disableInputText() {
+  textInputPlaceholder = ''
+  textInput = ''
 }
 
 function changeMode() {
@@ -154,6 +163,7 @@ function deselectAll() {
   graph.value.dehighlightEdges()
   interaction.deselectNode()
   interaction.deselectEdge()
+  disableInputText()
   drawCanvas()
   debugInfo.value = "deselected and dehighlighted"
 }
