@@ -25,15 +25,16 @@
     <div class="slection-specific-input">
       <span id="selection-info">{{ selectionInfo }}</span>:
       <input type="text" id="selection-input" v-model="textInput" :placeholder="textInputPlaceholder"
-        :disabled="textInputDisabled" @input="changeGraphValue">
+        @input="changeGraphValue" :disabled="!isSelectionSet">
 
       <div class="selection-buttons">
-        <input type="button" id="delete-selected-button" @click="deleteSelected" :disabled="textInputDisabled">
+        <input type="button" id="delete-selected-button" 
+          @click="deleteSelected" :disabled="!isSelectionSet">
       </div>
     </div>
 
     <div class="toolbar-right">
-      <span>{{ debugInfo }}</span>&nbsp;
+      <span>{{ graph.debugInfo }}</span>&nbsp;
       <input type="button" id="close-sidepanel-button" @click="hideRightPanel">
     </div>
   </div>
@@ -60,20 +61,19 @@
 import '@/assets/styles/toolbar.css'
 import '@/assets/styles/drawingboard.css'
 
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { drawGraph } from '@/utils/draw.js'
 import { Interaction } from '@/utils/interaction.js'
 
 const graph = defineModel({ required: true })
 const canvas = ref()
-const debugInfo = ref()
 
 const interaction = new Interaction(graph.value)
 var inputMode = 'select'
+var isSelectionSet = false
 var selectionInfo = ''
 var textInput = ''
 var textInputPlaceholder = ''
-var textInputDisabled = true
 
 window.addEventListener('resize', resizeCanvas, false)
 
@@ -86,10 +86,10 @@ onMounted(() => {
 })
 
 function resizeCanvas() {
-  if (canvas.value !== undefined) {
+  if (canvas.value !== undefined && canvas.value !== null) {
     canvas.value.width = window.innerWidth
     canvas.value.height = window.innerHeight
-    debugInfo.value = "resize canvas"
+    graph.value.debugInfo = "resize canvas"
     drawCanvas()
   }
 }
@@ -100,58 +100,51 @@ function drawCanvas() {
 
 function onPointerDown(event) {
   interaction.onPointerDown(event)
-  debugInfo.value = interaction.debugInfo ? interaction.debugInfo : debugInfo.value
-  drawCanvas()
 
   if (interaction.state.selectedNode !== undefined) {
-    enableInputText(graph.value.nodes[interaction.state.selectedNode].name, 'node name')
+    setSelection(graph.value.nodes[interaction.state.selectedNode].name, 'node name')
   } else if (interaction.state.selectedEdge !== undefined) {
     let edgeWeight = graph.value.nodes[interaction.state.selectedEdge.from]
       .edgesTo[interaction.state.selectedEdge.to].weight
-    enableInputText(edgeWeight, 'edge weight')
+    setSelection(edgeWeight, 'edge weight')
   } else {
-    disableInputText()
+    unsetSelection()
   }
 
   drawCanvas()
-  debugInfo.value = interaction.debugInfo ? interaction.debugInfo : debugInfo.value
 }
 
 function onPointerUp(event) {
   interaction.onPointerUp(event)
-  debugInfo.value = interaction.debugInfo
   drawCanvas()
 }
 
 function onPointerMove(event) {
   interaction.onPointerMove(event)
-  debugInfo.value = interaction.debugInfo
   drawCanvas()
 }
 
 function onContextMenu(event) {
   interaction.onContextMenu(event)
-  debugInfo.value = interaction.debugInfo
   drawCanvas()
 }
 
 function changeMode() {
   interaction.state.mode = inputMode
   interaction.deselectNode()
-  debugInfo.value = "changed input mode to " + inputMode
   drawCanvas()
 }
 
-function enableInputText(text, placeholder) {
+function setSelection(text, placeholder) {
+  isSelectionSet = true
   selectionInfo = placeholder
-  textInputDisabled = false
   textInputPlaceholder = placeholder
   textInput = text
 }
 
-function disableInputText() {
+function unsetSelection() {
+  isSelectionSet = false
   selectionInfo = ''
-  textInputDisabled = true
   textInputPlaceholder = ''
   textInput = ''
 }
@@ -177,13 +170,11 @@ function hideRightPanel() {
 function changeGraphValue() {
   if (interaction.state.selectedNode !== undefined) {
     graph.value.nodes[interaction.state.selectedNode].name = textInput
-    textInputPlaceholder = "changed node name"
   } else if (interaction.state.selectedEdge !== undefined) {
     let newWeight = Number(textInput)
     if (!isNaN(newWeight)) {
       graph.value.nodes[interaction.state.selectedEdge.from]
         .edgesTo[interaction.state.selectedEdge.to].weight = Number(textInput)
-      debugInfo.value = "changed edge weight"
     }
   }
 }
@@ -192,10 +183,12 @@ function deleteSelected() {
   if (interaction.state.selectedNode !== undefined) {
     graph.value.deleteNode(interaction.state.selectedNode)
     interaction.state.selectedNode = undefined
+    unsetSelection()
     drawCanvas()
   } else if (interaction.state.selectedEdge !== undefined) {
     graph.value.deleteEdge(interaction.state.selectedEdge.from, interaction.state.selectedEdge.to)
     interaction.state.selectedEdge = undefined
+    unsetSelection()
     drawCanvas()
   }
 }

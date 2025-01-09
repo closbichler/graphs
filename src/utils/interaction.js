@@ -3,13 +3,11 @@ import { CONSTANTS } from './draw.js'
 
 class Interaction {
   eventCache = []
-  debugInfo = "";
   state = {
     mode: 'select',
     selectedNode: undefined,
     selectedEdge: undefined,
     draggingNode: undefined,
-    mousePressed: false,
     dragClickPos: undefined,
     zoomPreviousDiff: 0
   }
@@ -73,8 +71,11 @@ class Interaction {
   }
 
   deselectNode() {
-    if (this.state.selectedNode !== undefined && this.graph.nodes[this.state.selectedNode] !== undefined)
-      this.graph.nodes[this.state.selectedNode].style.selected = false;
+    if (this.state.selectedNode === undefined)
+      return
+
+    this.graph.debugInfo = "node " + this.state.selectedNode + " deselected";
+    this.graph.nodes[this.state.selectedNode].style.selected = false;
     this.state.selectedNode = undefined;
   }
 
@@ -88,7 +89,7 @@ class Interaction {
     if (this.state.selectedEdge === undefined)
       return;
 
-    this.debugInfo = "edge (" + this.state.selectedEdge.from
+    this.graph.debugInfo = "edge (" + this.state.selectedEdge.from
       + "," + this.state.selectedEdge.to + ") deselected";
     this.graph.nodes[this.state.selectedEdge.from]
       .edgesTo[this.state.selectedEdge.to].style.selected = false;
@@ -98,25 +99,25 @@ class Interaction {
   #tryPutNode(pos) {
     let name = this.graph.nodes.length.toString();
     this.graph.putNode(name, pos);
-    this.debugInfo = "node " + name + " created";
+    this.graph.debugInfo = "node " + name + " created";
   }
 
   #tryPutEdge(node) {
     if (this.state.selectedNode === undefined) {
       this.#selectNode(node);
-      this.debugInfo = "node " + node + " selected";
+      this.graph.debugInfo = "node " + node + " selected";
     } else {
       if (node == this.state.selectedNode) {
         // alert for loop
-        this.debugInfo = "ERR: loops not implemented";
+        this.graph.debugInfo = "ERR: loops not implemented";
         this.deselectNode();
       } else if (this.graph.nodes[this.state.selectedNode].edgesTo[node] != undefined) {
         // alert for multi edge
-        this.debugInfo = "ERR: multigraph not implemented"
+        this.graph.debugInfo = "ERR: multigraph not implemented"
         this.deselectNode();
       } else {
         this.graph.insertEdge(this.state.selectedNode, node, 1)
-        this.debugInfo = "edge (" + this.state.selectedNode + "," + node + ") created"
+        this.graph.debugInfo = "edge (" + this.state.selectedNode + "," + node + ") created"
         this.deselectNode()
       }
     }
@@ -125,11 +126,11 @@ class Interaction {
   #trySelectNode(node) {
     if (this.state.selectedNode == node) {
       this.deselectNode();
-      this.debugInfo = "node " + node + " deselected";
+      this.graph.debugInfo = "node " + node + " deselected";
     } else {
       this.deselectNode();
       this.#selectNode(node);
-      this.debugInfo = "node " + node + " selected";
+      this.graph.debugInfo = "node " + node + " selected";
     }
   }
 
@@ -137,14 +138,14 @@ class Interaction {
     if (this.state.selectedEdge === undefined) {
       this.deselectEdge();
       this.#selectEdge(edge);
-      this.debugInfo = "edge (" + edge.from + "," + edge.to + ") selected";
+      this.graph.debugInfo = "edge (" + edge.from + "," + edge.to + ") selected";
     } else if (edge.to == this.state.selectedEdge.to
       && edge.from == this.state.selectedEdge.from) {
       this.deselectEdge();
     } else {
       this.deselectEdge();
       this.#selectEdge(edge);
-      this.debugInfo = "edge (" + edge.from + "," + edge.to + ") selected";
+      this.graph.debugInfo = "edge (" + edge.from + "," + edge.to + ") selected";
     }
   }
 
@@ -176,20 +177,20 @@ class Interaction {
 
     if (this.state.mode == 'put-node' && node === undefined) {
       this.#tryPutNode(mousePos);
+    } else if (this.state.mode == 'put-edge' && node !== undefined) {
+      this.#tryPutEdge(node);
     } else if (this.state.mode == 'select') {
       if (node !== undefined) {
-        this.#trySelectNode(node);
         this.deselectEdge();
+        this.#trySelectNode(node);
       } else if (edge !== undefined) {
-        this.#trySelectEdge(edge);
         this.deselectNode();
+        this.#trySelectEdge(edge);
       } else {
         this.deselectNode();
         this.deselectEdge();
       }
-    } else if (this.state.mode == 'put-edge' && node !== undefined) {
-      this.#tryPutEdge(node);
-    }
+    } 
   }
 
   onPointerUp(event) {

@@ -60,6 +60,8 @@ class Graph {
   offset = new Vector(0, 0)
   zoomFactor = 1
 
+  debugInfo = ""
+
   constructor(adjMatrix) {
     this.getNodesFromAdjMatrix(adjMatrix)
   }
