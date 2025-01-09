@@ -7,7 +7,8 @@ class Node {
 
   style = {
     selected: false,
-    highlighted: false
+    marked: false,
+    color: undefined
   }
 
   constructor(name) {
@@ -30,7 +31,7 @@ class Edge {
 
   style = {
     selected: false,
-    highlighted: false
+    marked: false
   }
 
   constructor(weight) {
@@ -191,25 +192,24 @@ class Graph {
   }
 
   // Styling
-  highlightNodes(path) {
-    for (let i of path) {
-      if (i < this.nodes.length)
-        this.nodes[i].style.highlighted = true;
+  highlightNodes(nodes) {
+    for (let i of nodes) {
+      this.nodes[i].style.marked = true;
     }
   }
 
   dehighlightNodes() {
     for (let node of this.nodes) {
-      node.style.highlighted = false;
+      node.style.marked = false;
     }
   }
 
-  highlightEdges(path) {
+  highlightEdges(edges) {
     let l = this.nodes.length;
-    for (let edge of path) {
+    for (let edge of edges) {
       if (edge[0] < l && this.nodes[edge[0]] !== undefined &&
         edge[1] < l && this.nodes[edge[0]].edgesTo[edge[1]] !== undefined)
-        this.nodes[edge[0]].edgesTo[edge[1]].style.highlighted = true;
+        this.nodes[edge[0]].edgesTo[edge[1]].style.marked = true;
     }
   }
 
@@ -217,7 +217,7 @@ class Graph {
     for (let node of this.nodes) {
       for (let edge of node.edgesTo) {
         if (edge !== undefined)
-          edge.style.highlighted = false;
+          edge.style.marked = false;
       }
     }
   }

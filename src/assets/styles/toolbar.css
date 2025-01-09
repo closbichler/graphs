@@ -35,19 +35,30 @@
 .slection-specific-input {
     width: 40em
 }
+
 #selection-info {
     display: inline-block;
     min-width: 7em;
 }
+
 #selection-input {
     width: 10em;
 }
+
 .selection-buttons {
     display: inline;
 }
 
+.selection-buttons input {
+    margin-right: 0.5em;
+}
+
 #delete-selected-button {
     background-image: url('/src/assets/icons/eraser.svg'); 
+}
+
+#mark-selected-button {
+background-image: url('/src/assets/icons/brush.svg'); 
 }
 
 #close-sidepanel-button {

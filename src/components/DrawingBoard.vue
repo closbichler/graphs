@@ -30,6 +30,8 @@
       <div class="selection-buttons">
         <input type="button" id="delete-selected-button" 
           @click="deleteSelected" :disabled="!isSelectionSet">
+        <input type="button" id="mark-selected-button" 
+          @click="markSelected" :disabled="!isSelectionSet">
       </div>
     </div>
 
@@ -184,12 +186,27 @@ function deleteSelected() {
     graph.value.deleteNode(interaction.state.selectedNode)
     interaction.state.selectedNode = undefined
     unsetSelection()
-    drawCanvas()
   } else if (interaction.state.selectedEdge !== undefined) {
     graph.value.deleteEdge(interaction.state.selectedEdge.from, interaction.state.selectedEdge.to)
     interaction.state.selectedEdge = undefined
     unsetSelection()
-    drawCanvas()
+  }
+}
+
+function markSelected() {
+  if (interaction.state.selectedNode !== undefined) {
+    let node = interaction.state.selectedNode
+    let nodeStyle = graph.value.nodes[node].style
+    nodeStyle.color = nodeStyle.color === undefined ? "green": undefined
+    interaction.deselectNode()
+    graph.value.debugInfo = "marked node " + node
+  } else if (interaction.state.selectedEdge !== undefined) {
+    let from = interaction.state.selectedEdge.from
+    let to = interaction.state.selectedEdge.to
+    let edgeStyle = graph.value.nodes[from].edgesTo[to].style
+    edgeStyle.color = edgeStyle.color === undefined ? "green" : undefined
+    interaction.deselectEdge()
+    graph.value.debugInfo = "marked edge (" + from + "," + to + ")"
   }
 }
 </script>

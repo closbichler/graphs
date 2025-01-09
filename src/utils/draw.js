@@ -33,12 +33,16 @@ function drawGrid(canvas, ctx) {
 function drawNode(ctx, node) {
   ctx.lineWidth = 2
   ctx.fillStyle = "#fff"
-  if (node.style.selected)
+  ctx.strokeStyle = CONSTANTS.defaultColor
+
+  if (node.style.selected) {
     ctx.strokeStyle = CONSTANTS.selectColor
-  else if (node.style.highlighted)
+  } else if (node.style.marked) {
     ctx.strokeStyle = CONSTANTS.highlightColor
-  else
-    ctx.strokeStyle = CONSTANTS.defaultColor
+    ctx.lineWidth = 3
+  } else if (node.style.color !== undefined) {
+    ctx.strokeStyle = node.style.color
+  }
 
   ctx.beginPath()
   ctx.arc(node.pos.x, node.pos.y, CONSTANTS.nodeSize, 0, 2 * Math.PI)
@@ -68,12 +72,16 @@ function drawArrow(ctx, node1, node2) {
 
 function drawEdge(ctx, node1, node2, edge, graphProperties) {
   ctx.lineWidth = 2
-  if (edge.style.selected)
+  ctx.strokeStyle = CONSTANTS.defaultColor
+
+  if (edge.style.selected) {
     ctx.strokeStyle = CONSTANTS.selectColor
-  else if (edge.style.highlighted)
+  } else if (edge.style.marked) {
     ctx.strokeStyle = CONSTANTS.highlightColor
-  else
-    ctx.strokeStyle = CONSTANTS.defaultColor
+    ctx.lineWidth = 3
+  } else if (edge.style.color !== undefined) {
+    ctx.strokeStyle = edge.style.color
+  }
 
   ctx.translate(edge.offset.x, edge.offset.y)
 

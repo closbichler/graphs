@@ -172,23 +172,25 @@ class Interaction {
   onPointerDown(event) {
     this.eventCache.push(event)
     let mousePos = this.#getPositionOnCanvas(event)
-    let node = this.#nodeSelected(mousePos);
-    let edge = this.#edgeSelected(mousePos);
+    let node = this.#nodeSelected(mousePos)
+    let edge = this.#edgeSelected(mousePos)
 
     if (this.state.mode == 'put-node' && node === undefined) {
-      this.#tryPutNode(mousePos);
+      this.#tryPutNode(mousePos)
     } else if (this.state.mode == 'put-edge' && node !== undefined) {
-      this.#tryPutEdge(node);
+      this.#tryPutEdge(node)
     } else if (this.state.mode == 'select') {
       if (node !== undefined) {
-        this.deselectEdge();
-        this.#trySelectNode(node);
+        this.deselectEdge()
+        this.#trySelectNode(node)
       } else if (edge !== undefined) {
-        this.deselectNode();
-        this.#trySelectEdge(edge);
+        this.deselectNode()
+        this.#trySelectEdge(edge)
       } else {
-        this.deselectNode();
-        this.deselectEdge();
+        this.deselectNode()
+        this.deselectEdge()
+        this.graph.dehighlightNodes()
+        this.graph.dehighlightEdges()
       }
     } 
   }

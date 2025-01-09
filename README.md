@@ -19,10 +19,7 @@ The repo is automatically deployed to github pages via Github Actions on commits
 ## Todo
 - Fix long edge select issue
 - Don't allow to enter ¬1 value for undirected graphs
-- Disable text field when deselecting
-- delete button
 - Multi-select, box-select
-- Implement zoom
 - Implement shortcuts for editing nodes
 - Implement context menu??
 - Re-introduce deselct button??
