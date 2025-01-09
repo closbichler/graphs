@@ -25,12 +25,13 @@ class Interaction {
   }
 
   #nodeSelected(mousePos) {
+    let nodes = this.graph.nodes
     let nearestNode = undefined
     let nearestDistance = CONSTANTS.nodeSize
-    for (let node of this.graph.nodes) {
-      let d = mousePos.distanceTo(node.pos)
+    for (let n=0; n<nodes.length; n++) {
+      let d = mousePos.distanceTo(nodes[n].pos)
       if (d < nearestDistance) {
-        nearestNode = node.id
+        nearestNode = n
         nearestDistance = d
       }
     }

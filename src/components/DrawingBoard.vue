@@ -27,20 +27,14 @@
       <input type="text" id="selection-input" v-model="textInput" :placeholder="textInputPlaceholder"
         :disabled="textInputDisabled" @input="changeGraphValue">
 
-      <div class="selection-buttons svg-buttons">
-        <label htmlFor="delete-selected">
-          <input type="button" id="delete-selected" @click="deleteSelected" disabled>
-          <span></span>
-        </label>
+      <div class="selection-buttons">
+        <input type="button" id="delete-selected-button" @click="deleteSelected" :disabled="textInputDisabled">
       </div>
     </div>
 
     <div class="toolbar-right">
       <span>{{ debugInfo }}</span>&nbsp;
-      <label htmlFor="close-sidepanel-button" id="close-sidepanel">
-        <input type="button" id="close-sidepanel-button" @click="hideRightPanel">
-        <span></span>
-      </label>
+      <input type="button" id="close-sidepanel-button" @click="hideRightPanel">
     </div>
   </div>
 
@@ -148,12 +142,6 @@ function changeMode() {
   drawCanvas()
 }
 
-function repositionGraph() {
-  graph.value.reposition()
-  debugInfo.value = "reposition graph"
-  drawCanvas()
-}
-
 function enableInputText(text, placeholder) {
   selectionInfo = placeholder
   textInputDisabled = false
@@ -197,6 +185,18 @@ function changeGraphValue() {
         .edgesTo[interaction.state.selectedEdge.to].weight = Number(textInput)
       debugInfo.value = "changed edge weight"
     }
+  }
+}
+
+function deleteSelected() {
+  if (interaction.state.selectedNode !== undefined) {
+    graph.value.deleteNode(interaction.state.selectedNode)
+    interaction.state.selectedNode = undefined
+    drawCanvas()
+  } else if (interaction.state.selectedEdge !== undefined) {
+    graph.value.deleteEdge(interaction.state.selectedEdge.from, interaction.state.selectedEdge.to)
+    interaction.state.selectedEdge = undefined
+    drawCanvas()
   }
 }
 </script>

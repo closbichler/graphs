@@ -1,9 +1,6 @@
 import { Vector } from './vector.js'
 
 class Node {
-  static NODE_COUNT = 0
-
-  id = -1
   name = ""
   pos = new Vector(0, 0)
   edgesTo = []
@@ -14,7 +11,6 @@ class Node {
   }
 
   constructor(name) {
-    this.id = Node.NODE_COUNT++
     this.name = name
   }
 
@@ -94,15 +90,27 @@ class Graph {
     }
   }
 
-  insertEdge(nodeFrom, nodeTo, weight) {
-    let edge = new Edge(weight);
-    this.nodes[nodeFrom].edgesTo[nodeTo] = edge;
-
-    if (!this.properties.directed) {
-      this.nodes[nodeTo].edgesTo[nodeFrom] = edge;
+  deleteNode(nodeIndex) {
+    this.nodes.splice(nodeIndex, 1)
+    for (let node of this.nodes) {
+      node.edgesTo.splice(nodeIndex, 1)
     }
+  }
+
+  insertEdge(from, to, weight) {
+    let edge = new Edge(weight);
+    this.nodes[from].edgesTo[to] = edge;
+
+    // TODO fix undirected graphs
+    // if (!this.properties.directed) {
+    //   this.nodes[to].edgesTo[from] = edge;
+    // }
 
     this.calculateEdgeOffset()
+  }
+
+  deleteEdge(from, to) {
+    this.nodes[from].edgesTo[to] = undefined
   }
 
   getNodesFromAdjMatrix(adjMatrix) {
