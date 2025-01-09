@@ -44,9 +44,11 @@
     </div>
   </div>
 
-  <div class="drawing-board">
-    <canvas id="drawing-board" ref="canvas" @contextmenu.prevent.stop="onContextMenu" @mousemove="onMouseDown"
-      @click="onMouseClick">
+  <div class="drawing-board-area">
+    <canvas id="drawing-board" ref="canvas" @contextmenu.prevent.stop="onContextMenu"
+      v-on:touchstart.prevent="" v-on:pointercancel="onPointerUp" v-on:pointerleave="onPointerUp"
+      v-on:pointerdown="onPointerDown" v-on:pointerup="onPointerUp"
+      v-on:pointermove="onPointerMove">
       Your browser does not support the canvas element.
     </canvas>
     <ul id="drawing-board-context-menu">
@@ -54,8 +56,8 @@
       <li>Remove</li>
     </ul>
     <div class="zoom-group">
-      <input type="button" value="+" @onclick="zoomIn()">
-      <input type="button" value="-" @onclick="zoomOut()">
+      <input type="button" value="-" @click="zoomOut()">
+      <input type="button" value="+" @click="zoomIn()">
     </div>
   </div>
 </template>
@@ -102,8 +104,10 @@ function drawCanvas() {
   drawGraph(canvas.value, graph.value)
 }
 
-function onMouseClick(event) {
-  interaction.onCanvasClick(event)
+function onPointerDown(event) {
+  interaction.onPointerDown(event)
+  debugInfo.value = interaction.debugInfo ? interaction.debugInfo : debugInfo.value
+  drawCanvas()
 
   if (interaction.state.selectedNode !== undefined) {
     enableInputText(graph.value.nodes[interaction.state.selectedNode].name, 'node name')
@@ -119,20 +123,35 @@ function onMouseClick(event) {
   debugInfo.value = interaction.debugInfo ? interaction.debugInfo : debugInfo.value
 }
 
-function onMouseDown(event) {
-  if (!interaction.onCanvasDrag(event))
-    return
-
-  drawCanvas()
+function onPointerUp(event) {
+  interaction.onPointerUp(event)
   debugInfo.value = interaction.debugInfo
+  drawCanvas()
+}
+
+function onPointerMove(event) {
+  interaction.onPointerMove(event)
+  debugInfo.value = interaction.debugInfo
+  drawCanvas()
 }
 
 function onContextMenu(event) {
-  if (!interaction.onContextMenu(event))
-    return
-
-  drawCanvas()
+  interaction.onContextMenu(event)
   debugInfo.value = interaction.debugInfo
+  drawCanvas()
+}
+
+function changeMode() {
+  interaction.state.mode = inputMode
+  interaction.deselectNode()
+  debugInfo.value = "changed input mode to " + inputMode
+  drawCanvas()
+}
+
+function repositionGraph() {
+  graph.value.reposition()
+  debugInfo.value = "reposition graph"
+  drawCanvas()
 }
 
 function enableInputText(text, placeholder) {
@@ -149,25 +168,14 @@ function disableInputText() {
   textInput = ''
 }
 
-function changeMode() {
-  interaction.state.mode = inputMode
-  interaction.deselectNode()
-  drawCanvas()
-  debugInfo.value = "changed input mode to " + inputMode
-}
-
 function zoomIn() {
-  if (graph.value.zoomFactor < 2)
-    graph.value.zoomFactor += 1.2
-  else
-    graph.value.zoomFactor += 1.6
+  if (graph.value.zoomFactor <= 2)
+  graph.value.zoomFactor *= 1.2
 }
 
 function zoomOut() {
-  if (graph.value.zoomFactor < 2)
-    graph.value.zoomFactor -= 1.2
-  else
-    graph.value.zoomFactor -= 1.6
+  if (graph.value.zoomFactor >= 0.7)
+    graph.value.zoomFactor /= 1.2
 }
 
 function hideRightPanel() {

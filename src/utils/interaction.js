@@ -2,6 +2,7 @@ import { Vector } from './vector.js'
 import { CONSTANTS } from './draw.js'
 
 class Interaction {
+  eventCache = []
   debugInfo = "";
   state = {
     mode: 'select',
@@ -9,7 +10,8 @@ class Interaction {
     selectedEdge: undefined,
     draggingNode: undefined,
     mousePressed: false,
-    dragClickPos: undefined
+    dragClickPos: undefined,
+    zoomPreviousDiff: 0
   }
 
   constructor(graph) {
@@ -17,10 +19,12 @@ class Interaction {
   }
 
   #getPositionOnCanvas(event) {
-    return new Vector(event.offsetX - this.graph.offset.x, event.offsetY - this.graph.offset.y)
+    let x = (event.offsetX - this.graph.offset.x) / this.graph.zoomFactor
+    let y = (event.offsetY - this.graph.offset.y) / this.graph.zoomFactor
+    return new Vector(x, y)
   }
 
-  #nodeClicked(mousePos) {
+  #nodeSelected(mousePos) {
     let nearestNode = undefined
     let nearestDistance = CONSTANTS.nodeSize
     for (let node of this.graph.nodes) {
@@ -33,7 +37,7 @@ class Interaction {
     return nearestNode;
   }
 
-  #edgeClicked(mousePos) {
+  #edgeSelected(mousePos) {
     let bestEdge = undefined
     let bestDistance = 15
 
@@ -143,10 +147,31 @@ class Interaction {
     }
   }
 
-  onCanvasClick(event) {
+  #zoom() {
+    // TODO: repress default zoom event
+    let cursor1Pos = this.#getPositionOnCanvas(eventCache[0])
+    let cursor2Pos = this.#getPositionOnCanvas(eventCache[1])
+    let diff = cursor1Pos.distanceTo(cursor2Pos)
+
+    if (this.state.zoomPreviousDiff > 0) {
+      let zoom = (diff - this.state.zoomPreviousDiff) / 100
+      this.graph.zoomFactor *= zoom
+    }
+
+    this.state.zoomPreviousDiff = diff
+  }
+
+  #panCanvas(mousePos) {
+    if (this.state.dragClickPos === undefined)
+      this.state.dragClickPos = mousePos.clone()
+    this.graph.offset = this.graph.offset.add(mousePos.sub(this.state.dragClickPos))
+  }
+
+  onPointerDown(event) {
+    this.eventCache.push(event)
     let mousePos = this.#getPositionOnCanvas(event)
-    let node = this.#nodeClicked(mousePos);
-    let edge = this.#edgeClicked(mousePos);
+    let node = this.#nodeSelected(mousePos);
+    let edge = this.#edgeSelected(mousePos);
 
     if (this.state.mode == 'put-node' && node === undefined) {
       this.#tryPutNode(mousePos);
@@ -166,53 +191,62 @@ class Interaction {
     }
   }
 
-  onCanvasDrag(event) {
-    if (this.state.mode !== "select")
-      return false
+  onPointerUp(event) {
+    // Remove this event from cache
+    let index = this.eventCache.findIndex(
+      (cachedEvent) => cachedEvent.pointerId === event.pointerId,
+    );
+    this.eventCache.splice(index, 1);
 
-    if (event.buttons != 0)
-      this.state.mousePressed = true
-    else
-      this.state.mousePressed = false
-
-    let mousePos = this.#getPositionOnCanvas(event)
-    let node = this.#nodeClicked(mousePos)
-
-    if (this.state.mousePressed) {
-      if (node != undefined && this.state.dragging == false &&
-        (this.state.draggingNode === undefined || this.graph.nodes[this.state.draggingNode] === undefined)) {
-        this.state.draggingNode = node;
-      }
-
-      if (this.state.draggingNode !== undefined) {
-        this.graph.nodes[this.state.draggingNode].pos = mousePos.clone()
-        this.debugInfo = "drag " + this.state.draggingNode
-        this.state.dragging = true
-        this.graph.calculateEdgeOffset()
-        return true
-      }
-
-      if (node === undefined) {
-        if (this.state.dragClickPos === undefined)
-          this.state.dragClickPos = mousePos.clone()
-        this.graph.offset = this.graph.offset.add(mousePos.sub(this.state.dragClickPos))
-      }
-
-      this.state.dragging = true
-    } else {
-      this.state.dragging = false
-
-      this.state.draggingNode = undefined
-      this.state.dragClickPos = undefined
+    if (this.eventCache.length < 2) {
+      this.state.zoomPreviousDiff = -1;
     }
 
-    return false;
+    // Draging things
+    this.state.dragging = false
+    this.state.draggingNode = undefined
+    this.state.dragClickPos = undefined
+  }
+
+  onPointerMove(event) {
+    // TODO: put into extra funcition
+    let index = this.eventCache.findIndex(
+      (cachedEvent) => cachedEvent.pointerId === event.pointerId,
+    );
+    this.eventCache[index] = event;
+
+    let mousePressed = event.buttons >= 1
+
+    if (this.state.mode !== "select" || !mousePressed)
+      return
+
+    let mousePos = this.#getPositionOnCanvas(event)
+    let node = this.#nodeSelected(mousePos)
+    let edge = this.#edgeSelected(mousePos)
+
+    if (this.eventCache.length === 2) {
+      this.#zoom()
+    } else if (node === undefined && edge === undefined && !this.state.dragging) {
+      this.#panCanvas(mousePos)
+    } else if (node !== undefined || this.state.dragging) {
+      // Drag node
+      if (this.state.draggingNode === undefined) {
+        this.state.draggingNode = node;
+        this.state.dragging = true
+      } else {
+        this.graph.nodes[this.state.draggingNode].pos = mousePos.clone()
+        this.state.dragging = true
+        this.graph.calculateEdgeOffset()
+      }
+    } else if (edge !== undefined) {
+      // TODO: Drag edge
+    }
   }
 
   onContextMenu(event) {
     let mousePos = this.#getPositionOnCanvas(event)
-    let node = this.#nodeClicked(mousePos);
-    let edge = this.#edgeClicked(mousePos);
+    let node = this.#nodeSelected(mousePos);
+    let edge = this.#edgeSelected(mousePos);
 
     // TODO
   }

@@ -127,6 +127,7 @@ function drawGraph(canvas, graph) {
     drawNode(ctx, node)
   }
 
+  ctx.scale(1/graph.zoomFactor, 1/graph.zoomFactor)
   ctx.translate(-graph.offset.x, -graph.offset.y)
 }
 
