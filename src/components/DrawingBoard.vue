@@ -1,6 +1,6 @@
 <template>
   <div class="toolbar">
-    <div class="select-mode">
+    <div class="select-mode svg-buttons">
       <fieldset>
         <label htmlFor="input-mode-1">
           <input type="radio" id="input-mode-1" value="select" name="input-mode" v-model="inputMode"
@@ -22,21 +22,21 @@
       </fieldset>
     </div>
 
-    <div>
-      <button @click="repositionGraph" type="reset">Reposition</button>
-    </div>
-    <div>
-      <button @click="deselectAll" type="reset">Deselect</button>
-    </div>
+    <div class="slection-specific-input">
+      <span id="selection-info">{{ selectionInfo }}</span>:
+      <input type="text" id="selection-input" v-model="textInput" :placeholder="textInputPlaceholder"
+        :disabled="textInputDisabled" @input="changeGraphValue">
 
-    <div>
-      <input type="text" v-model="textInput" :placeholder="textInputPlaceholder" :disabled="textInputPlaceholder == ''"
-        @input="changeGraphValue">
+      <div class="selection-buttons svg-buttons">
+        <label htmlFor="delete-selected">
+          <input type="button" id="delete-selected" @click="deleteSelected" disabled>
+          <span></span>
+        </label>
+      </div>
     </div>
-
-    <span>{{ debugInfo }}</span>
 
     <div class="toolbar-right">
+      <span>{{ debugInfo }}</span>&nbsp;
       <label htmlFor="close-sidepanel-button" id="close-sidepanel">
         <input type="button" id="close-sidepanel-button" @click="hideRightPanel">
         <span></span>
@@ -75,9 +75,11 @@ const canvas = ref()
 const debugInfo = ref()
 
 const interaction = new Interaction(graph.value)
-var inputMode = "select"
-var textInput = ""
-var textInputPlaceholder = ""
+var inputMode = 'select'
+var selectionInfo = ''
+var textInput = ''
+var textInputPlaceholder = ''
+var textInputDisabled = true
 
 window.addEventListener('resize', resizeCanvas, false)
 
@@ -108,16 +110,17 @@ function onPointerDown(event) {
   drawCanvas()
 
   if (interaction.state.selectedNode !== undefined) {
-    textInput = graph.value.nodes[interaction.state.selectedNode].name
-    textInputPlaceholder = "node name"
+    enableInputText(graph.value.nodes[interaction.state.selectedNode].name, 'node name')
   } else if (interaction.state.selectedEdge !== undefined) {
-    textInput = graph.value.nodes[interaction.state.selectedEdge.from]
+    let edgeWeight = graph.value.nodes[interaction.state.selectedEdge.from]
       .edgesTo[interaction.state.selectedEdge.to].weight
-    textInputPlaceholder = "edge weight"
+    enableInputText(edgeWeight, 'edge weight')
   } else {
-    textInput = ""
-    textInputPlaceholder = undefined
+    disableInputText()
   }
+
+  drawCanvas()
+  debugInfo.value = interaction.debugInfo ? interaction.debugInfo : debugInfo.value
 }
 
 function onPointerUp(event) {
@@ -151,13 +154,18 @@ function repositionGraph() {
   drawCanvas()
 }
 
-function deselectAll() {
-  graph.value.dehighlightNodes()
-  graph.value.dehighlightEdges()
-  interaction.deselectNode()
-  interaction.deselectEdge()
-  debugInfo.value = "deselected and dehighlighted"
-  drawCanvas()
+function enableInputText(text, placeholder) {
+  selectionInfo = placeholder
+  textInputDisabled = false
+  textInputPlaceholder = placeholder
+  textInput = text
+}
+
+function disableInputText() {
+  selectionInfo = ''
+  textInputDisabled = true
+  textInputPlaceholder = ''
+  textInput = ''
 }
 
 function zoomIn() {

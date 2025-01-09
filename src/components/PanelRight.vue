@@ -30,7 +30,7 @@
           <input type='submit' value='calculate' @click='funcFindPath'>
         </div>
         <div class='grid'>
-          <span id='result'>{{ path }}</span>
+          <span id='result'>{{ pathFindingResult }}</span>
         </div>
       </div>
     </details>
@@ -46,7 +46,7 @@ import { findPath } from '@/utils/pathfinder'
 
 const graph = defineModel({ required: true })
 const emit = defineEmits(['update:modelValue'])
-const path = ref();
+const pathFindingResult = ref()
 
 function sampleGraph(sampleNo) {
   graph.value.applySampleGraph(sampleNo)
@@ -56,26 +56,25 @@ function funcFindPath() {
   graph.value.dehighlightNodes()
   graph.value.dehighlightEdges()
 
-  let n1 = Number(document.getElementById('in1').value)
-  let n2 = Number(document.getElementById('in2').value)
+  let originNodeIndex = graph.value.getNodeIndexByName(document.getElementById('in1').value)
+  let destNodeIndex = graph.value.getNodeIndexByName(document.getElementById('in2').value)
 
-  if (!(n1 < graph.value.nodes.length && n2 < graph.value.nodes.length)) {
-    path.value = "wrong input";
-    return;
+  if (isNaN(originNodeIndex) || isNaN(destNodeIndex) ||
+      originNodeIndex < 0 || originNodeIndex >= graph.value.nodes.length ||
+      destNodeIndex < 0 || destNodeIndex >= graph.value.nodes.length) {
+    pathFindingResult.value = "wrong input"
+    return
   }
 
-  let result = findPath(graph.value, n1, n2)
-
-  if (result === undefined) {
-    path.value = "undefined";
-    return;
+  let path = findPath(graph.value, originNodeIndex, destNodeIndex)
+  if (path !== undefined) {
+    pathFindingResult.value = path
+    graph.value.highlightNodes(path)
+    for (let i = 0; i < path.length - 1; i++) {
+      graph.value.highlightEdges([[path[i], path[i + 1]]])
+    }
+  } else {
+    pathFindingResult.value = "not reachable"
   }
-
-  graph.value.highlightNodes(result.visitedNodes)
-  for (let i = 0; i < result.visitedNodes.length - 1; i++) {
-    graph.value.highlightEdges([[result.visitedNodes[i], result.visitedNodes[i + 1]]])
-  }
-
-  path.value = result.visitedNodes;
 }
 </script>

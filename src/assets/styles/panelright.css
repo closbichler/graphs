@@ -1,13 +1,12 @@
 .panel-right {
     position: fixed;
     font-size: 0.8rem;
-    width: 20vw;
+    width: 20em;
     min-width: 0;
     height: 100%;
     padding: 0.5em;
     top: var(--toolbar-height);
     right: 0;
-    transition: width 0.3s;
     background-color: var(--pico-modal-overlay-background-color);
 }
 
@@ -30,4 +29,10 @@
 
 .collapsed {
     width: 0;
+    padding: 0;
+    margin: 0;
+    transition: width 0.3s ease;
+    -moz-transition: width 0.3s ease;
+    -webkit-transition: width 0.3s ease;
+    -o-transition: width 0.3s ease;
 }

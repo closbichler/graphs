@@ -9,6 +9,10 @@
     padding: 0.5em;
 }
 
+.panel-left > * {
+    margin-bottom: 2em;
+}
+
 #adj-matrix {
     width: calc(100% - 1em);
     height: 10rem;

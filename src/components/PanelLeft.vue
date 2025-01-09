@@ -1,32 +1,37 @@
 <template>
-  <div class='panel panel-left grid'>
+  <div class='panel panel-left'>
     <div calss='adj-matrix-div'>
       <span>Adjacency Matrix</span>
       <textarea id='adj-matrix' aria-describedby='adj-matrix-helper' @input='onEditTextarea()'
         v-model='adjMatrixInput'></textarea>
       <small id='adj-matrix-helper'></small>
+    </div>
+
+    <div>
+      <div>
+        <input type='checkbox' id='check-directed' v-model='options.directed' v-on:change='toggleCheckboxes'>
+        <label for='check-directed'>directed</label>
+      </div>
 
       <div>
-        <div>
-          <input type='checkbox' id='check-directed' v-model='options.directed' v-on:change='toggleCheckboxes'>
-          <label for='check-directed'>directed</label>
-        </div>
-
-        <div>
-          <input type='checkbox' id='check-weighted' v-model='options.weighted' v-on:change='toggleCheckboxes'>
-          <label for='check-weighted'>weighted</label>
-        </div>
-
-        <div style="display:none">
-          <input type='checkbox' id='check-loops' v-model='options.loops' v-on:change='toggleCheckboxes'>
-          <label for='check-loops'>loops allowed</label>
-        </div>
-
-        <div style="display:none">
-          <input type='checkbox' id='check-simple' v-model='options.simple' v-on:change='toggleCheckboxes'>
-          <label for='check-simple'>simple graph</label>
-        </div>
+        <input type='checkbox' id='check-weighted' v-model='options.weighted' v-on:change='toggleCheckboxes'>
+        <label for='check-weighted'>weighted</label>
       </div>
+
+      <div style="display:none">
+        <input type='checkbox' id='check-loops' v-model='options.loops' v-on:change='toggleCheckboxes'>
+        <label for='check-loops'>loops allowed</label>
+      </div>
+
+      <div style="display:none">
+        <input type='checkbox' id='check-simple' v-model='options.simple' v-on:change='toggleCheckboxes'>
+        <label for='check-simple'>simple graph</label>
+      </div>
+    </div>
+
+    <div>
+      <button @click="repositionGraph" type="reset">Reposition</button>
+      <button @click="deselectAll" type="reset" style='display:none'>Deselect</button>
     </div>
 
   </div>
@@ -137,5 +142,21 @@ function updateCheckboxes() {
   options.loops = graph.value.properties.loops
   options.weighted = graph.value.properties.weighted
   options.simple = graph.value.properties.simple
+}
+
+function repositionGraph() {
+  graph.value.reposition()
+}
+
+function deselectAll() {
+  // TODO
+  return
+  graph.value.dehighlightNodes()
+  graph.value.dehighlightEdges()
+  interaction.deselectNode()
+  interaction.deselectEdge()
+  disableInputText()
+  drawCanvas()
+  debugInfo.value = "deselected and dehighlighted"
 }
 </script>
