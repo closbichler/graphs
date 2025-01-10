@@ -13,7 +13,7 @@
     background-color: var(--pico-background-color);
 }
 
-.toolbar div {
+.toolbar>div {
     padding: 0 0.5em 0 0.5em;
     margin: 0;
 }
@@ -22,7 +22,8 @@
     margin: 0;
 }
 
-.toolbar button, .toolbar input {
+.toolbar button,
+.toolbar input {
     height: var(--button-height);
     width: var(--button-height);
     font-size: 0.8em;
@@ -32,8 +33,18 @@
     background-position: center;
 }
 
+.toolbar>* {
+    height: var(--button-height);
+}
+
 .slection-specific-input {
-    width: 40em
+    width: 40em;
+    display: contents;
+}
+
+.slection-specific-input>* {
+    padding: 0 0.5em 0 0.5em;
+    display: inline-block;
 }
 
 #selection-info {
@@ -54,11 +65,11 @@
 }
 
 #delete-selected-button {
-    background-image: url('/src/assets/icons/eraser.svg'); 
+    background-image: url('/src/assets/icons/eraser.svg');
 }
 
 #mark-selected-button {
-background-image: url('/src/assets/icons/brush.svg'); 
+    background-image: url('/src/assets/icons/brush.svg');
 }
 
 #close-sidepanel-button {
@@ -69,10 +80,12 @@ background-image: url('/src/assets/icons/brush.svg');
 .select-mode label[for="input-mode-1"] span:after {
     background-image: url('/src/assets/icons/pointer.svg');
 }
+
 .select-mode label[for="input-mode-2"] span:before,
 .select-mode label[for="input-mode-2"] span:after {
     background-image: url('/src/assets/icons/plus-circle.svg');
 }
+
 .select-mode label[for="input-mode-3"] span:before,
 .select-mode label[for="input-mode-3"] span:after {
     background-image: url('/src/assets/icons/arrow.svg');
@@ -86,15 +99,18 @@ background-image: url('/src/assets/icons/brush.svg');
 .svg-buttons input {
     display: none
 }
+
 .svg-buttons label {
     display: inline-block;
     cursor: pointer;
     margin: 0;
 }
+
 .svg-buttons label span {
     position: relative;
     line-height: 22px;
 }
+
 .svg-buttons label span:before,
 .svg-buttons label span:after {
     content: '';
@@ -108,6 +124,7 @@ background-image: url('/src/assets/icons/brush.svg');
     background-repeat: no-repeat;
     background-position: center;
 }
+
 .svg-buttons label span:after {
     background-color: var(--pico-primary-hover-background);
     border: 4px solid var(--pico-primary-hover-background);
@@ -117,9 +134,11 @@ background-image: url('/src/assets/icons/brush.svg');
     transition: 300ms;
     opacity: 0%;
 }
+
 .svg-buttons label input:checked+span:after {
     opacity: 100%;
 }
-.svg-buttons input:disabled + span {
+
+.svg-buttons input:disabled+span {
     opacity: 40%;
 }

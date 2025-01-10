@@ -50,6 +50,17 @@ class Edge {
   }
 }
 
+class EdgeSpec {
+  constructor(from, to) {
+    this.from = from
+    this.to = to
+  }
+
+  clone() {
+    return new EdgeSpec(this.from, this.to)
+  }
+}
+
 class Graph {
   nodes = []
   properties = {
@@ -61,6 +72,11 @@ class Graph {
   offset = new Vector(0, 0)
   zoomFactor = 1
 
+  selection = {
+    node: undefined,
+    edge: undefined
+  }
+  inputMode = "select"
   debugInfo = ""
 
   constructor(adjMatrix) {
@@ -111,9 +127,10 @@ class Graph {
 
     this.calculateEdgeOffset()
   }
-
+  
   deleteEdge(from, to) {
     this.nodes[from].edgesTo[to] = undefined
+    this.calculateEdgeOffset()
   }
 
   getNodesFromAdjMatrix(adjMatrix) {
@@ -192,24 +209,48 @@ class Graph {
   }
 
   // Styling
+  selectNode(nodeIndex) {
+    this.deselect()
+    this.nodes[nodeIndex].style.selected = true
+    this.selection.node = nodeIndex
+  }
+
+  selectEdge(edgeSpec) {
+    this.deselect()
+    this.nodes[edgeSpec.from].edgesTo[edgeSpec.to].style.selected = true
+    this.selection.edge = edgeSpec.clone()
+  }
+
+  deselect() {
+    this.selection.node = undefined
+    this.selection.edge = undefined
+    for (let node of this.nodes) {
+      node.style.selected = false
+      for (let edge of node.edgesTo) {
+        if (edge !== undefined)
+          edge.style.selected = false
+      }
+    }
+  }
+
   highlightNodes(nodes) {
     for (let i of nodes) {
-      this.nodes[i].style.marked = true;
+      this.nodes[i].style.marked = true
     }
   }
 
   dehighlightNodes() {
     for (let node of this.nodes) {
-      node.style.marked = false;
+      node.style.marked = false
     }
   }
 
   highlightEdges(edges) {
-    let l = this.nodes.length;
+    let l = this.nodes.length
     for (let edge of edges) {
       if (edge[0] < l && this.nodes[edge[0]] !== undefined &&
         edge[1] < l && this.nodes[edge[0]].edgesTo[edge[1]] !== undefined)
-        this.nodes[edge[0]].edgesTo[edge[1]].style.marked = true;
+        this.nodes[edge[0]].edgesTo[edge[1]].style.marked = true
     }
   }
 
@@ -217,7 +258,7 @@ class Graph {
     for (let node of this.nodes) {
       for (let edge of node.edgesTo) {
         if (edge !== undefined)
-          edge.style.marked = false;
+          edge.style.marked = false
       }
     }
   }

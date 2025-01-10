@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { Graph } from './utils/graph'
 
 import DrawingBoard from './components/DrawingBoard.vue'
+import Toolbar from './components/Toolbar.vue'
 import LeftPanel from './components/PanelLeft.vue'
 import RightPanel from './components/PanelRight.vue'
 
@@ -12,12 +13,12 @@ graph.value.applySampleGraph(0)
 
 <template>
   <main>
-    <div class="drawing-board-wrapper container">
-      <DrawingBoard v-model="graph" />
-    </div>
+    <Toolbar v-model="graph" />
+
+    <DrawingBoard v-model="graph" />
 
     <LeftPanel v-model="graph" />
-    
+
     <RightPanel v-model="graph" />
   </main>
 </template>
