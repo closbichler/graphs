@@ -20,6 +20,7 @@ The repo is automatically deployed to github pages via Github Actions on commits
 - Fix long edge select issue
 - Don't allow to enter ¬1 value for undirected graphs
 - Multi-select, box-select
+- Rectangles?
 - Implement shortcuts for editing nodes
 - Implement context menu??
 - Re-introduce deselct button??
