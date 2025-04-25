@@ -10,7 +10,6 @@ class Vector {
 
   sub(vec) {
     return new Vector(this.x - vec.x, this.y - vec.y)
-
   }
 
   mult(a) {
@@ -22,8 +21,7 @@ class Vector {
   }
 
   length() {
-    return Math.sqrt(Math.pow(this.x, 2) +
-      Math.pow(this.y, 2))
+    return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2))
   }
 
   distanceTo(v) {

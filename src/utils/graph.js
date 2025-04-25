@@ -1,4 +1,4 @@
-import { Vector } from './vector.js'
+import { Vector } from "./vector.js"
 
 class Node {
   name = ""
@@ -8,7 +8,7 @@ class Node {
   style = {
     selected: false,
     marked: false,
-    color: undefined
+    color: undefined,
   }
 
   constructor(name) {
@@ -31,7 +31,7 @@ class Edge {
 
   style = {
     selected: false,
-    marked: false
+    marked: false,
   }
 
   constructor(weight) {
@@ -39,7 +39,9 @@ class Edge {
   }
 
   calculateOffset(pos1, pos2) {
-    this.offset = Vector.getDistanceVector(pos1, pos2).perpendicularRight().mult(5)
+    this.offset = Vector.getDistanceVector(pos1, pos2)
+      .perpendicularRight()
+      .mult(5)
   }
 
   clone() {
@@ -67,14 +69,14 @@ class Graph {
     directed: true,
     simple: true,
     loops: true,
-    weighted: true
+    weighted: true,
   }
   offset = new Vector(0, 0)
   zoomFactor = 1
 
   selection = {
     node: undefined,
-    edge: undefined
+    edge: undefined,
   }
   inputMode = "select"
   debugInfo = ""
@@ -85,13 +87,15 @@ class Graph {
 
   reposition() {
     // positions nodes in a circle
-    let l = this.nodes.length, d = 20 * l
+    let l = this.nodes.length,
+      d = 20 * l
     this.offset = new Vector(window.innerWidth / 2, window.innerHeight / 2)
 
     for (let i = 0; i < l; i++) {
       let pos = new Vector(
         Math.sin((i / l) * (Math.PI * 2)) * d,
-        Math.cos((i / l) * (Math.PI * 2)) * d)
+        Math.cos((i / l) * (Math.PI * 2)) * d
+      )
       this.nodes[i].pos = pos
       this.offset = this.offset.add(pos)
     }
@@ -117,8 +121,8 @@ class Graph {
   }
 
   insertEdge(from, to, weight) {
-    let edge = new Edge(weight);
-    this.nodes[from].edgesTo[to] = edge;
+    let edge = new Edge(weight)
+    this.nodes[from].edgesTo[to] = edge
 
     // TODO fix undirected graphs
     // if (!this.properties.directed) {
@@ -127,7 +131,7 @@ class Graph {
 
     this.calculateEdgeOffset()
   }
-  
+
   deleteEdge(from, to) {
     this.nodes[from].edgesTo[to] = undefined
     this.calculateEdgeOffset()
@@ -145,12 +149,14 @@ class Graph {
     }
 
     this.nodes.forEach((node, index) => {
-      node.edgesTo = [];
+      node.edgesTo = []
       for (let i = 0; i < nNodes; i++) {
-        let edgeTo = undefined;
+        let edgeTo = undefined
         if (adjMatrix[index][i] != 0)
-          edgeTo = this.properties.weighted ? new Edge(adjMatrix[index][i]) : new Edge(1);
-        node.edgesTo.push(edgeTo);
+          edgeTo = this.properties.weighted
+            ? new Edge(adjMatrix[index][i])
+            : new Edge(1)
+        node.edgesTo.push(edgeTo)
       }
     })
 
@@ -158,24 +164,23 @@ class Graph {
   }
 
   getAdjMatrix() {
-    let matrix = [];
+    let matrix = []
     for (let i = 0; i < this.nodes.length; i++) {
-      matrix.push([]);
+      matrix.push([])
       for (let j = 0; j < this.nodes.length; j++) {
         if (this.nodes[i].edgesTo[j] != undefined) {
-          matrix[i].push(this.nodes[i].edgesTo[j].weight);
+          matrix[i].push(this.nodes[i].edgesTo[j].weight)
         } else {
-          matrix[i].push(0);
+          matrix[i].push(0)
         }
       }
     }
-    return matrix;
+    return matrix
   }
 
   getNodeIndexByName(nodeName) {
-    for (let n=0; n<this.nodes.length; n++) {
-      if (this.nodes[n].name === nodeName)
-        return n
+    for (let n = 0; n < this.nodes.length; n++) {
+      if (this.nodes[n].name === nodeName) return n
     }
     return undefined
   }
@@ -183,11 +188,20 @@ class Graph {
   calculateEdgeOffset() {
     for (let n = 0; n < this.nodes.length; n++) {
       for (let e = n + 1; e < this.nodes.length; e++) {
-        if (this.nodes[n].edgesTo[e] === undefined || this.nodes[e].edgesTo[n] === undefined)
+        if (
+          this.nodes[n].edgesTo[e] === undefined ||
+          this.nodes[e].edgesTo[n] === undefined
+        )
           continue
 
-        this.nodes[e].edgesTo[n].calculateOffset(this.nodes[e].pos, this.nodes[n].pos)
-        this.nodes[n].edgesTo[e].calculateOffset(this.nodes[n].pos, this.nodes[e].pos)
+        this.nodes[e].edgesTo[n].calculateOffset(
+          this.nodes[e].pos,
+          this.nodes[n].pos
+        )
+        this.nodes[n].edgesTo[e].calculateOffset(
+          this.nodes[n].pos,
+          this.nodes[e].pos
+        )
       }
     }
   }
@@ -227,8 +241,7 @@ class Graph {
     for (let node of this.nodes) {
       node.style.selected = false
       for (let edge of node.edgesTo) {
-        if (edge !== undefined)
-          edge.style.selected = false
+        if (edge !== undefined) edge.style.selected = false
       }
     }
   }
@@ -248,8 +261,12 @@ class Graph {
   highlightEdges(edges) {
     let l = this.nodes.length
     for (let edge of edges) {
-      if (edge[0] < l && this.nodes[edge[0]] !== undefined &&
-        edge[1] < l && this.nodes[edge[0]].edgesTo[edge[1]] !== undefined)
+      if (
+        edge[0] < l &&
+        this.nodes[edge[0]] !== undefined &&
+        edge[1] < l &&
+        this.nodes[edge[0]].edgesTo[edge[1]] !== undefined
+      )
         this.nodes[edge[0]].edgesTo[edge[1]].style.marked = true
     }
   }
@@ -257,66 +274,69 @@ class Graph {
   dehighlightEdges() {
     for (let node of this.nodes) {
       for (let edge of node.edgesTo) {
-        if (edge !== undefined)
-          edge.style.marked = false
+        if (edge !== undefined) edge.style.marked = false
       }
     }
   }
 }
 
 const SAMPLE_GRAPHS = [
-  new Graph(
-    [[0, 1, 0, 0, 0],
+  new Graph([
+    [0, 1, 0, 0, 0],
     [0, 0, 0, 1, 0],
     [0, 0, 0, 0, 0],
     [0, 0, 1, 0, 1],
-    [0, 0, 0, 0, 0]]),
-  new Graph(
-    [[0, 1, 0, 0, 1],
+    [0, 0, 0, 0, 0],
+  ]),
+  new Graph([
+    [0, 1, 0, 0, 1],
     [1, 0, 1, 0, 0],
     [0, 1, 0, 1, 0],
     [0, 0, 1, 0, 1],
-    [1, 0, 0, 1, 0]]),
-  new Graph(
-    [[0, 1, 1, 0, 0, 0, 0],
+    [1, 0, 0, 1, 0],
+  ]),
+  new Graph([
+    [0, 1, 1, 0, 0, 0, 0],
     [0, 0, 0, 1, 1, 0, 0],
     [0, 0, 0, 0, 0, 1, 1],
     [0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0]]),
-  new Graph(
-    [[0, 1, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+  ]),
+  new Graph([
+    [0, 1, 0, 0, 1, 0],
     [0, 0, 1, 0, 0, 0],
     [0, 0, 0, 0, 0, 1],
     [0, 0, 1, 0, 0, 0],
     [0, 1, 1, 0, 0, 1],
-    [0, 1, 0, 1, 0, 0]])
+    [0, 1, 0, 1, 0, 0],
+  ]),
 ]
 
 SAMPLE_GRAPHS[0].properties = {
   simple: true,
   directed: true,
   weighted: false,
-  loops: false
+  loops: false,
 }
 SAMPLE_GRAPHS[1].properties = {
   simple: true,
   directed: true,
   weighted: false,
-  loops: false
+  loops: false,
 }
 SAMPLE_GRAPHS[2].properties = {
   simple: true,
   directed: true,
   weighted: false,
-  loops: false
+  loops: false,
 }
 SAMPLE_GRAPHS[3].properties = {
   simple: true,
   directed: false,
   weighted: false,
-  loops: false
+  loops: false,
 }
 
 SAMPLE_GRAPHS[0].reposition()
@@ -329,7 +349,10 @@ SAMPLE_GRAPHS[2].nodes[3].pos = new Vector(0, 2 * d)
 SAMPLE_GRAPHS[2].nodes[4].pos = new Vector(2 * d, 2 * d)
 SAMPLE_GRAPHS[2].nodes[5].pos = new Vector(4 * d, 2 * d)
 SAMPLE_GRAPHS[2].nodes[6].pos = new Vector(6 * d, 2 * d)
-SAMPLE_GRAPHS[2].offset = new Vector(window.innerWidth / 2 - 3 * d, window.innerHeight / 2 - d)
+SAMPLE_GRAPHS[2].offset = new Vector(
+  window.innerWidth / 2 - 3 * d,
+  window.innerHeight / 2 - d
+)
 d = 90
 SAMPLE_GRAPHS[3].nodes[0].pos = new Vector(0, d)
 SAMPLE_GRAPHS[3].nodes[1].pos = new Vector(d, 0)
@@ -337,6 +360,9 @@ SAMPLE_GRAPHS[3].nodes[2].pos = new Vector(2 * d, 0)
 SAMPLE_GRAPHS[3].nodes[3].pos = new Vector(3 * d, d)
 SAMPLE_GRAPHS[3].nodes[4].pos = new Vector(d, 2 * d)
 SAMPLE_GRAPHS[3].nodes[5].pos = new Vector(2 * d, 2 * d)
-SAMPLE_GRAPHS[3].offset = new Vector(window.innerWidth / 2 - 2 * d, window.innerHeight / 2 - d)
+SAMPLE_GRAPHS[3].offset = new Vector(
+  window.innerWidth / 2 - 2 * d,
+  window.innerHeight / 2 - d
+)
 
 export { Node, Edge, Graph }

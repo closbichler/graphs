@@ -1,11 +1,11 @@
-import { Vector } from './vector.js'
+import { Vector } from "./vector.js"
 
 const CONSTANTS = {
   nodeSize: 30,
   defaultColor: "#000",
   selectColor: "#f00",
   highlightColor: "#06d",
-  gridSize: 30
+  gridSize: 30,
 }
 
 function clearCanvas(canvas, ctx) {
@@ -57,7 +57,10 @@ function drawNode(ctx, node) {
 }
 
 function drawArrow(ctx, node1, node2) {
-  let edgeVector = Vector.getDistanceVector(node1.pos, node2.pos).getUnitVector()
+  let edgeVector = Vector.getDistanceVector(
+    node1.pos,
+    node2.pos
+  ).getUnitVector()
   let arrowStart = node2.pos.sub(edgeVector.mult(CONSTANTS.nodeSize))
   let arrowEnd = arrowStart.sub(edgeVector.mult(12))
   let arrowRight = arrowEnd.add(edgeVector.perpendicularRight().mult(5))
@@ -103,7 +106,10 @@ function drawEdge(ctx, node1, node2, edge, graphProperties) {
     ctx.font = "10pt sans-serif"
     ctx.fillStyle = "#000"
     let mid = Vector.getMidpoint(node1.pos, node2.pos)
-    let perp = Vector.getDistanceVector(node1.pos, node2.pos).getUnitVector().perpendicularRight().mult(14)
+    let perp = Vector.getDistanceVector(node1.pos, node2.pos)
+      .getUnitVector()
+      .perpendicularRight()
+      .mult(14)
     ctx.fillText(edge.weight, mid.x + perp.x, mid.y + perp.y)
   }
 
@@ -124,8 +130,7 @@ function drawGraph(canvas, graph) {
       let edge = node.edgesTo[i]
       let destNode = graph.nodes[i]
 
-      if (edge === undefined)
-        continue
+      if (edge === undefined) continue
 
       drawEdge(ctx, node, destNode, edge, graph.properties)
     }
@@ -135,7 +140,7 @@ function drawGraph(canvas, graph) {
     drawNode(ctx, node)
   }
 
-  ctx.scale(1/graph.zoomFactor, 1/graph.zoomFactor)
+  ctx.scale(1 / graph.zoomFactor, 1 / graph.zoomFactor)
   ctx.translate(-graph.offset.x, -graph.offset.y)
 }
 

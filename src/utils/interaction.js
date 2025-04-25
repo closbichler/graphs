@@ -1,16 +1,16 @@
-import { Vector } from './vector.js'
-import { CONSTANTS } from './draw.js'
+import { Vector } from "./vector.js"
+import { CONSTANTS } from "./draw.js"
 
 class Interaction {
   eventCache = []
   state = {
     draggingNode: undefined,
     dragClickPos: undefined,
-    zoomPreviousDiff: 0
+    zoomPreviousDiff: 0,
   }
 
   constructor(graph) {
-    this.graph = graph;
+    this.graph = graph
   }
 
   #getPositionOnCanvas(event) {
@@ -30,7 +30,7 @@ class Interaction {
         nearestDistance = d
       }
     }
-    return nearestNode;
+    return nearestNode
   }
 
   #edgeSelected(mousePos) {
@@ -38,11 +38,10 @@ class Interaction {
     let bestDistance = 15
 
     for (let from = 0; from < this.graph.nodes.length; from++) {
-      let nodeFrom = this.graph.nodes[from];
+      let nodeFrom = this.graph.nodes[from]
 
       for (let to = 0; to < nodeFrom.edgesTo.length; to++) {
-        if (nodeFrom.edgesTo[to] === undefined)
-          continue;
+        if (nodeFrom.edgesTo[to] === undefined) continue
 
         mousePos = mousePos.sub(nodeFrom.edgesTo[to].offset)
         let nodeTo = this.graph.nodes[to]
@@ -50,71 +49,76 @@ class Interaction {
         let b = nodeFrom.pos.distanceTo(mousePos)
         let c = nodeTo.pos.distanceTo(mousePos)
         let s = (a + b + c) / 2
-        let h = 2 / a * Math.sqrt(s * (s - a) * (s - b) * (s - c))
+        let h = (2 / a) * Math.sqrt(s * (s - a) * (s - b) * (s - c))
 
         if (h < bestDistance) {
-          bestEdge = { from: from, to: to };
+          bestEdge = { from: from, to: to }
           bestDistance = h
         }
       }
     }
 
-    return bestEdge;
+    return bestEdge
   }
 
   #selectNode(node) {
-    this.graph.nodes[node].style.selected = true;
-    this.graph.selection.node = node;
+    this.graph.nodes[node].style.selected = true
+    this.graph.selection.node = node
   }
 
   deselectNode() {
-    if (this.graph.selection.node === undefined)
-      return
+    if (this.graph.selection.node === undefined) return
 
-    this.graph.debugInfo = "node " + this.graph.selection.node + " deselected";
-    this.graph.nodes[this.graph.selection.node].style.selected = false;
-    this.graph.selection.node = undefined;
+    this.graph.debugInfo = "node " + this.graph.selection.node + " deselected"
+    this.graph.nodes[this.graph.selection.node].style.selected = false
+    this.graph.selection.node = undefined
   }
 
   #selectEdge(edge) {
-    this.graph.selection.edge = edge;
-    this.graph.nodes[edge.from]
-      .edgesTo[edge.to].style.selected = true;
+    this.graph.selection.edge = edge
+    this.graph.nodes[edge.from].edgesTo[edge.to].style.selected = true
   }
 
   deselectEdge() {
-    if (this.graph.selection.edge === undefined)
-      return;
+    if (this.graph.selection.edge === undefined) return
 
-    this.graph.debugInfo = "edge (" + this.graph.selection.edge.from
-      + "," + this.graph.selection.edge.to + ") deselected";
-    this.graph.nodes[this.graph.selection.edge.from]
-      .edgesTo[this.graph.selection.edge.to].style.selected = false;
-    this.graph.selection.edge = undefined;
+    this.graph.debugInfo =
+      "edge (" +
+      this.graph.selection.edge.from +
+      "," +
+      this.graph.selection.edge.to +
+      ") deselected"
+    this.graph.nodes[this.graph.selection.edge.from].edgesTo[
+      this.graph.selection.edge.to
+    ].style.selected = false
+    this.graph.selection.edge = undefined
   }
 
   #tryPutNode(pos) {
-    let name = this.graph.nodes.length.toString();
-    this.graph.putNode(name, pos);
-    this.graph.debugInfo = "node " + name + " created";
+    let name = this.graph.nodes.length.toString()
+    this.graph.putNode(name, pos)
+    this.graph.debugInfo = "node " + name + " created"
   }
 
   #tryPutEdge(node) {
     if (this.graph.selection.node === undefined) {
-      this.#selectNode(node);
-      this.graph.debugInfo = "node " + node + " selected";
+      this.#selectNode(node)
+      this.graph.debugInfo = "node " + node + " selected"
     } else {
       if (node == this.graph.selection.node) {
         // alert for loop
-        this.graph.debugInfo = "ERR: loops not implemented";
-        this.deselectNode();
-      } else if (this.graph.nodes[this.graph.selection.node].edgesTo[node] != undefined) {
+        this.graph.debugInfo = "ERR: loops not implemented"
+        this.deselectNode()
+      } else if (
+        this.graph.nodes[this.graph.selection.node].edgesTo[node] != undefined
+      ) {
         // alert for multi edge
         this.graph.debugInfo = "ERR: multigraph not implemented"
-        this.deselectNode();
+        this.deselectNode()
       } else {
         this.graph.insertEdge(this.graph.selection.node, node, 1)
-        this.graph.debugInfo = "edge (" + this.graph.selection.node + "," + node + ") created"
+        this.graph.debugInfo =
+          "edge (" + this.graph.selection.node + "," + node + ") created"
         this.deselectNode()
       }
     }
@@ -122,27 +126,29 @@ class Interaction {
 
   #trySelectNode(node) {
     if (this.graph.selection.node == node) {
-      this.deselectNode();
-      this.graph.debugInfo = "node " + node + " deselected";
+      this.deselectNode()
+      this.graph.debugInfo = "node " + node + " deselected"
     } else {
-      this.deselectNode();
-      this.#selectNode(node);
-      this.graph.debugInfo = "node " + node + " selected";
+      this.deselectNode()
+      this.#selectNode(node)
+      this.graph.debugInfo = "node " + node + " selected"
     }
   }
 
   #trySelectEdge(edge) {
     if (this.graph.selection.edge === undefined) {
-      this.deselectEdge();
-      this.#selectEdge(edge);
-      this.graph.debugInfo = "edge (" + edge.from + "," + edge.to + ") selected";
-    } else if (edge.to == this.graph.selection.edge.to
-      && edge.from == this.graph.selection.edge.from) {
-      this.deselectEdge();
+      this.deselectEdge()
+      this.#selectEdge(edge)
+      this.graph.debugInfo = "edge (" + edge.from + "," + edge.to + ") selected"
+    } else if (
+      edge.to == this.graph.selection.edge.to &&
+      edge.from == this.graph.selection.edge.from
+    ) {
+      this.deselectEdge()
     } else {
-      this.deselectEdge();
-      this.#selectEdge(edge);
-      this.graph.debugInfo = "edge (" + edge.from + "," + edge.to + ") selected";
+      this.deselectEdge()
+      this.#selectEdge(edge)
+      this.graph.debugInfo = "edge (" + edge.from + "," + edge.to + ") selected"
     }
   }
 
@@ -163,7 +169,9 @@ class Interaction {
   #panCanvas(mousePos) {
     if (this.state.dragClickPos === undefined)
       this.state.dragClickPos = mousePos.clone()
-    this.graph.offset = this.graph.offset.add(mousePos.sub(this.state.dragClickPos))
+    this.graph.offset = this.graph.offset.add(
+      mousePos.sub(this.state.dragClickPos)
+    )
   }
 
   onPointerDown(event) {
@@ -172,11 +180,11 @@ class Interaction {
     let node = this.#nodeSelected(mousePos)
     let edge = this.#edgeSelected(mousePos)
 
-    if (this.graph.inputMode == 'put-node' && node === undefined) {
+    if (this.graph.inputMode == "put-node" && node === undefined) {
       this.#tryPutNode(mousePos)
-    } else if (this.graph.inputMode == 'put-edge' && node !== undefined) {
+    } else if (this.graph.inputMode == "put-edge" && node !== undefined) {
       this.#tryPutEdge(node)
-    } else if (this.graph.inputMode == 'select') {
+    } else if (this.graph.inputMode == "select") {
       if (node !== undefined) {
         this.deselectEdge()
         this.#trySelectNode(node)
@@ -195,12 +203,12 @@ class Interaction {
   onPointerUp(event) {
     // Remove this event from cache
     let index = this.eventCache.findIndex(
-      (cachedEvent) => cachedEvent.pointerId === event.pointerId,
-    );
-    this.eventCache.splice(index, 1);
+      (cachedEvent) => cachedEvent.pointerId === event.pointerId
+    )
+    this.eventCache.splice(index, 1)
 
     if (this.eventCache.length < 2) {
-      this.state.zoomPreviousDiff = -1;
+      this.state.zoomPreviousDiff = -1
     }
 
     // Draging things
@@ -212,14 +220,13 @@ class Interaction {
   onPointerMove(event) {
     // TODO: put into extra funcition
     let index = this.eventCache.findIndex(
-      (cachedEvent) => cachedEvent.pointerId === event.pointerId,
-    );
-    this.eventCache[index] = event;
+      (cachedEvent) => cachedEvent.pointerId === event.pointerId
+    )
+    this.eventCache[index] = event
 
     let mousePressed = event.buttons >= 1
 
-    if (this.graph.inputMode !== "select" || !mousePressed)
-      return
+    if (this.graph.inputMode !== "select" || !mousePressed) return
 
     let mousePos = this.#getPositionOnCanvas(event)
     let node = this.#nodeSelected(mousePos)
@@ -227,12 +234,16 @@ class Interaction {
 
     if (this.eventCache.length === 2) {
       this.#zoom()
-    } else if (node === undefined && edge === undefined && !this.state.dragging) {
+    } else if (
+      node === undefined &&
+      edge === undefined &&
+      !this.state.dragging
+    ) {
       this.#panCanvas(mousePos)
     } else if (node !== undefined || this.state.dragging) {
       // Drag node
       if (this.state.draggingNode === undefined) {
-        this.state.draggingNode = node;
+        this.state.draggingNode = node
         this.state.dragging = true
       } else {
         this.graph.nodes[this.state.draggingNode].pos = mousePos.clone()
@@ -246,12 +257,11 @@ class Interaction {
 
   onContextMenu(event) {
     let mousePos = this.#getPositionOnCanvas(event)
-    let node = this.#nodeSelected(mousePos);
-    let edge = this.#edgeSelected(mousePos);
+    let node = this.#nodeSelected(mousePos)
+    let edge = this.#edgeSelected(mousePos)
 
     // TODO
   }
 }
 
-
-export { Interaction };
+export { Interaction }
