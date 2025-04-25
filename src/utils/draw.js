@@ -5,7 +5,7 @@ const CONSTANTS = {
   gridFill: "#222",
   gridStroke: "#aaa",
   selectColor: "#13171f",
-  highlightColor: "#06d",
+  highlightColor: "#b7403b",
   nodeFill: "#0172ad",
   nodeStroke: "#ddd",
   edgeStroke: "#ddd",
@@ -41,11 +41,10 @@ function drawNode(ctx, node) {
 
   if (node.style.selected) {
     ctx.fillStyle = CONSTANTS.selectColor
-  } else if (node.style.marked) {
-    ctx.fillStyle = CONSTANTS.highlightColor
+  }
+  if (node.style.marked || node.style.color !== undefined) {
+    ctx.strokeStyle = CONSTANTS.highlightColor
     ctx.lineWidth = 3
-  } else if (node.style.color !== undefined) {
-    ctx.fillStyle = node.style.color
   }
 
   ctx.beginPath()
@@ -54,7 +53,7 @@ function drawNode(ctx, node) {
   ctx.stroke()
   ctx.closePath()
 
-  ctx.lineWidth = 0.8
+  ctx.lineWidth = 1
   ctx.font = "14px sans-serif"
   ctx.textAlign = "center"
   ctx.strokeText(node.name, node.pos.x, node.pos.y + CONSTANTS.nodeSize / 5)
