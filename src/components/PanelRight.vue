@@ -4,11 +4,11 @@
       <summary role='button'>Example Graphs</summary>
       <div class='example-graphs'>
         <div class='grid'>
-          <input type='button' value='1' @click='sampleGraph(1)'>
-          <input type='button' value='2' @click='sampleGraph(2)'>
+          <input type='button' value='cycle' @click='sampleGraph(1)'>
+          <input type='button' value='binary tree' @click='sampleGraph(2)'>
         </div>
         <div class='grid'>
-          <input type='button' value='3' @click='sampleGraph(3)'>
+          <input type='button' value='net' @click='sampleGraph(3)'>
         </div>
       </div>
     </details>
@@ -34,6 +34,17 @@
         </div>
       </div>
     </details>
+    <details display="none">
+      <summary role='button'>Directed acyclic graph</summary>
+      <div class='function-input'>
+        <div class='grid'>
+          <input type='submit' value='Is DAG?' @click='funcDAG'>
+        </div>
+        <div class='grid'>
+          <span id='result'>{{ resultDAG }}</span>
+        </div>
+      </div>
+    </details>
     <details style="display:none">
       <summary role='button'>BFS</summary>
       <div class='function-input'>
@@ -47,7 +58,7 @@
           <input type='submit' value='execute' @click='funcBFS'>
         </div>
         <div class='grid'>
-          <span id='result'>{{ bfsResult }}</span>
+          <span id='result'>{{ resultBFS }}</span>
         </div>
       </div>
     </details>
@@ -60,11 +71,13 @@ import '@/assets/styles/panelright.css'
 
 import { ref } from 'vue'
 import { findPath } from '@/utils/dijkstra'
+import { isDAG } from '@/utils/dag'
 
 const graph = defineModel({ required: true })
 const emit = defineEmits(['update:modelValue'])
 const resultDijkstra = ref()
 const resultBFS = ref()
+const resultDAG = ref()
 
 function sampleGraph(sampleNo) {
   graph.value.applySampleGraph(sampleNo)
@@ -95,6 +108,20 @@ function funcDijkstra() {
     }
   } else {
     resultDijkstra.value = "unreachable"
+  }
+}
+
+function funcDAG() {
+  if (!graph.value.properties.directed) {
+    resultDAG.value = "graph must be directed"
+  } 
+
+  let dag = isDAG(graph.value)
+
+  if (dag) {
+    resultDAG.value = "It is DAG!"
+  } else {
+    resultDAG.value = "Found a cycle. No DAG!"
   }
 }
 
