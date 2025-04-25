@@ -6,14 +6,13 @@ function findPath(graph, originNode, destNode) {
       cost: Infinity,
     }
   }
+  visited[originNode].cost = 0
 
   visited = getCostOfNeighbors(graph, visited, originNode, 0, destNode)
-  if (visited[destNode].cost == Infinity) {
-    return undefined
-  }
-
+  if (visited[destNode].cost == Infinity) return undefined
   let path = [destNode]
   let currentNode = destNode
+  
   while (currentNode != originNode) {
     currentNode = visited[currentNode].predecessor
     path.push(currentNode)
@@ -33,7 +32,7 @@ function getCostOfNeighbors(
 
   let visitedThisTime = []
   for (let i = 0; i < graph.nodes.length; i++) {
-    let edge = getEdge(graph, currentNode, i)
+    let edge = graph.nodes[currentNode].edgesTo[i]
     if (edge === undefined) continue
 
     let costToVisit = currentCost + edge.weight
@@ -50,15 +49,6 @@ function getCostOfNeighbors(
   }
 
   return visited
-}
-
-// Hack, because undirected graphs have directed edges
-function getEdge(graph, from, to) {
-  let edgeTo = graph.nodes[from].edgesTo[to]
-  if (edgeTo !== undefined) return edgeTo
-
-  let edgeFrom = graph.nodes[to].edgesTo[from]
-  if (edgeFrom !== undefined && !graph.properties.directed) return edgeFrom
 }
 
 export { findPath }

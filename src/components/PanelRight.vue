@@ -77,7 +77,9 @@ function funcDijkstra() {
   let originNodeIndex = graph.value.getNodeIndexByName(document.getElementById('dijkstraIn1').value)
   let destNodeIndex = graph.value.getNodeIndexByName(document.getElementById('dijkstraIn2').value)
 
-  if (isNaN(originNodeIndex) || isNaN(destNodeIndex) ||
+  if (!graph.value.properties.directed) {
+    resultDijkstra.value = "graph must be directed"
+  } else if (isNaN(originNodeIndex) || isNaN(destNodeIndex) ||
       originNodeIndex < 0 || originNodeIndex >= graph.value.nodes.length ||
       destNodeIndex < 0 || destNodeIndex >= graph.value.nodes.length) {
     resultDijkstra.value = "wrong input"
@@ -92,7 +94,7 @@ function funcDijkstra() {
       graph.value.highlightEdges([[path[i], path[i + 1]]])
     }
   } else {
-    resultDijkstra.value = "not reachable"
+    resultDijkstra.value = "unreachable"
   }
 }
 
