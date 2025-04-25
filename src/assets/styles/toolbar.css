@@ -50,6 +50,7 @@
 #selection-info {
     display: inline-block;
     min-width: 7em;
+    text-align: right;
 }
 
 #selection-input {
@@ -96,23 +97,23 @@
     right: 0.5em;
 }
 
-.svg-buttons input {
+.select-mode input {
     display: none
 }
 
-.svg-buttons label {
+.select-mode label {
     display: inline-block;
     cursor: pointer;
-    margin: 0;
+    margin: 0 0.5em 0 0;
 }
 
-.svg-buttons label span {
+.select-mode label span {
     position: relative;
     line-height: 22px;
 }
 
-.svg-buttons label span:before,
-.svg-buttons label span:after {
+.select-mode label span:before,
+.select-mode label span:after {
     content: '';
     background-color: var(--pico-primary-background);
     border: 4px solid var(--pico-primary-background);
@@ -125,20 +126,20 @@
     background-position: center;
 }
 
-.svg-buttons label span:after {
-    background-color: var(--pico-primary-hover-background);
-    border: 4px solid var(--pico-primary-hover-background);
+.select-mode label span:after {
+    background-color: var(--pico-accordion-active-summary-color);
+    border: 4px solid var(--pico-accordion-active-summary-color);
     position: absolute;
-    top: -4px;
+    top: -3px;
     left: 0px;
     transition: 300ms;
     opacity: 0%;
 }
 
-.svg-buttons label input:checked+span:after {
+.select-mode label input:checked+span:after {
     opacity: 100%;
 }
 
-.svg-buttons input:disabled+span {
+.select-mode input:disabled+span {
     opacity: 40%;
 }

@@ -1,6 +1,6 @@
 <template>
     <div class="toolbar">
-        <div class="select-mode svg-buttons">
+        <div class="select-mode">
             <fieldset>
                 <label htmlFor="input-mode-1">
                     <input type="radio" id="input-mode-1" value="select" name="input-mode" v-model="inputMode"
@@ -24,7 +24,7 @@
 
         <div class="slection-specific-input">
             <div>
-                <span id="selection-info">{{ selectionInfo }}</span>:
+                <span id="selection-info">{{ selectionInfo }}</span>&nbsp;
                 <input type="text" id="selection-input" v-model="textInput" :placeholder="textInputPlaceholder"
                     @input="changeGraphValue" :disabled="!isSelectionSet">
             </div>
