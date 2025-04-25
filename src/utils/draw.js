@@ -2,20 +2,24 @@ import { Vector } from "./vector.js"
 
 const CONSTANTS = {
   nodeSize: 30,
-  defaultColor: "#000",
-  selectColor: "#f00",
+  gridFill: "#222",
+  gridStroke: "#aaa",
+  selectColor: "#13171f",
   highlightColor: "#06d",
+  nodeFill: "#0172ad",
+  nodeStroke: "#ddd",
+  edgeStroke: "#ddd",
   gridSize: 30,
 }
 
 function clearCanvas(canvas, ctx) {
-  ctx.fillStyle = "#fff"
+  ctx.fillStyle = "#222"
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 }
 
 function drawGrid(canvas, ctx) {
-  ctx.lineWidth = 1
-  ctx.strokeStyle = "#ddd"
+  ctx.lineWidth = 0.08
+  ctx.strokeStyle = CONSTANTS.gridStroke
 
   for (let i = 0; i < canvas.width; i += CONSTANTS.gridSize) {
     ctx.moveTo(i, 0)
@@ -32,16 +36,16 @@ function drawGrid(canvas, ctx) {
 
 function drawNode(ctx, node) {
   ctx.lineWidth = 2
-  ctx.fillStyle = "#fff"
-  ctx.strokeStyle = CONSTANTS.defaultColor
+  ctx.fillStyle = CONSTANTS.nodeFill
+  ctx.strokeStyle = CONSTANTS.nodeStroke
 
   if (node.style.selected) {
-    ctx.strokeStyle = CONSTANTS.selectColor
+    ctx.fillStyle = CONSTANTS.selectColor
   } else if (node.style.marked) {
-    ctx.strokeStyle = CONSTANTS.highlightColor
+    ctx.fillStyle = CONSTANTS.highlightColor
     ctx.lineWidth = 3
   } else if (node.style.color !== undefined) {
-    ctx.strokeStyle = node.style.color
+    ctx.fillStyle = node.style.color
   }
 
   ctx.beginPath()
@@ -75,7 +79,7 @@ function drawArrow(ctx, node1, node2) {
 
 function drawEdge(ctx, node1, node2, edge, graphProperties) {
   ctx.lineWidth = 2
-  ctx.strokeStyle = CONSTANTS.defaultColor
+  ctx.strokeStyle = CONSTANTS.edgeStroke
 
   if (edge.style.selected) {
     ctx.strokeStyle = CONSTANTS.selectColor
@@ -104,7 +108,7 @@ function drawEdge(ctx, node1, node2, edge, graphProperties) {
   // weight text
   if (graphProperties.weighted) {
     ctx.font = "10pt sans-serif"
-    ctx.fillStyle = "#000"
+    ctx.fillStyle = CONSTANTS.edgeStroke
     let mid = Vector.getMidpoint(node1.pos, node2.pos)
     let perp = Vector.getDistanceVector(node1.pos, node2.pos)
       .getUnitVector()
